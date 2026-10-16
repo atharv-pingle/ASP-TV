@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/channel.dart';
 import '../services/channel_service.dart';
@@ -43,7 +42,6 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
   void initState() {
     super.initState();
     _currentChannel = widget.initialChannel;
-    WakelockPlus.enable();
     _playChannel(_currentChannel);
   }
 
@@ -228,7 +226,6 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
     _controller?.removeListener(_checkStreamHealth);
     _controller?.dispose();
     _focusNode.dispose();
-    WakelockPlus.disable();
     super.dispose();
   }
 
