@@ -29,17 +29,17 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Ensure Android Wrapper & Scaffold
-        run: flutter create . --platforms=android --org com.asptv
-
-      - name: Restore Custom Android TV Manifest & Config
-        run: git checkout HEAD -- android/app/src/main/AndroidManifest.xml android/app/build.gradle android/settings.gradle
+      - name: Verify Flutter Installation
+        run: flutter doctor -v
 
       - name: Install Dependencies
         run: flutter pub get
 
+      - name: Make Gradle Wrapper Executable
+        run: chmod +x android/gradlew
+
       - name: Build Release APK
-        run: flutter build apk --release --verbose
+        run: flutter build apk --release
 
       - name: Upload Release APK Artifact
         uses: actions/upload-artifact@v4
