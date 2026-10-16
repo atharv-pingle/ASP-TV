@@ -5,7 +5,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch: # Allows manual 1-click build trigger
+  workflow_dispatch:
 
 jobs:
   build:
@@ -29,14 +29,17 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Verify Flutter Installation
-        run: flutter doctor -v
+      - name: Ensure Android Wrapper & Scaffold
+        run: flutter create . --platforms=android --org com.asptv
+
+      - name: Restore Custom Android TV Manifest & Config
+        run: git checkout HEAD -- android/app/src/main/AndroidManifest.xml android/app/build.gradle android/settings.gradle
 
       - name: Install Dependencies
         run: flutter pub get
 
       - name: Build Release APK
-        run: flutter build apk --release
+        run: flutter build apk --release --verbose
 
       - name: Upload Release APK Artifact
         uses: actions/upload-artifact@v4
@@ -54,14 +57,10 @@ jobs:
           body: |
             ## ASP TV Live - Android TV APK 📺
             
-            ### Highlights:
-            - **Marathi, Hindi & English News Channels** (ABP Majha, Zee 24 Taas, TV9 Marathi, News18 Lokmat, Aaj Tak, ABP News, Zee News, NDTV, India Today, Republic, and more).
-            - **Simple & Clean 10-foot UI** designed specifically for Smart TVs, Android TV boxes, Fire TV sticks, and Google TV.
-            - **Remote D-Pad Control**: Full arrow key navigation with glowing focus highlights.
-            - **Fullscreen 16:9 Playback**: Instant channel surfing with ▲ / ▼ keys on the remote.
-            - **Quick Guide Drawer**: Press OK to peek at all channels while watching live TV.
-            - **Favorites**: Bookmark your top channels with a single click.
+            - **Marathi, Hindi & English Live News**
+            - **Leanback 10-foot TV UI with Remote D-Pad Navigation**
+            - **Fullscreen 16:9 Playback with Instant ▲ / ▼ Channel Zapping**
             
-            Download `app-release.apk` below and install it directly on your TV.
+            Download `app-release.apk` below and install it directly on your Android TV or Fire TV Stick.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
