@@ -24,7 +24,8 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.asptv.news"
-    compileSdk 34
+    compileSdk flutter.compileSdkVersion
+    ndkVersion flutter.ndkVersion
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -42,7 +43,7 @@ android {
     defaultConfig {
         applicationId "com.asptv.news"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -50,8 +51,6 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.debug
-            minifyEnabled false
-            shrinkResources false
         }
     }
 }
