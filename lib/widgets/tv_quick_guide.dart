@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/channel.dart';
 import '../theme/tv_theme.dart';
@@ -104,6 +105,22 @@ class _QuickGuideItemState extends State<_QuickGuideItem> {
           _isFocused = focused;
         });
       },
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent) {
+          final key = event.logicalKey;
+          if (key == LogicalKeyboardKey.select ||
+              key == LogicalKeyboardKey.enter ||
+              key == LogicalKeyboardKey.numpadEnter ||
+              key == LogicalKeyboardKey.space ||
+              key == LogicalKeyboardKey.gameButtonA ||
+              key.keyId == 0x00100000017 ||
+              key.keyId == 0x00100000042) {
+            widget.onSelect();
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
       child: GestureDetector(
         onTap: widget.onSelect,
         child: AnimatedContainer(
@@ -144,12 +161,21 @@ class _QuickGuideItemState extends State<_QuickGuideItem> {
                     ? CachedNetworkImage(
                         imageUrl: widget.channel.logo,
                         fit: BoxFit.contain,
-                        errorWidget: (context, url, error) => Image.asset(
-                          'assets/images/tv-icon.png',
-                          fit: BoxFit.contain,
+                        errorWidget: (context, url, error) => Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.08),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Icon(Icons.live_tv_rounded, size: 18, color: TVTheme.focusColor),
                         ),
                       )
-                    : Image.asset('assets/images/tv-icon.png', fit: BoxFit.contain),
+                    : Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Icon(Icons.live_tv_rounded, size: 18, color: TVTheme.focusColor),
+                      ),
               ),
               const SizedBox(width: 12),
               Expanded(

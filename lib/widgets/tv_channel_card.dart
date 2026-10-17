@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/channel.dart';
 import '../theme/tv_theme.dart';
@@ -23,6 +25,120 @@ class TVChannelCard extends StatefulWidget {
 
 class _TVChannelCardState extends State<TVChannelCard> {
   bool _isFocused = false;
+  Timer? _longPressTimer;
+  bool _longPressTriggered = false;
+
+  @override
+  void dispose() {
+    _longPressTimer?.cancel();
+    super.dispose();
+  }
+
+  bool _isSelectKey(LogicalKeyboardKey key) {
+    return key == LogicalKeyboardKey.select ||
+        key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter ||
+        key == LogicalKeyboardKey.space ||
+        key == LogicalKeyboardKey.gameButtonA ||
+        key.keyId == 0x00100000017 || // KEYCODE_DPAD_CENTER
+        key.keyId == 0x00100000042 || // KEYCODE_ENTER
+        key.keyLabel.toLowerCase() == 'select' ||
+        key.keyLabel.toLowerCase() == 'enter';
+  }
+
+  void _onKeyDown(LogicalKeyboardKey key) {
+    if (!_isSelectKey(key)) return;
+    if (_longPressTimer != null && _longPressTimer!.isActive) return;
+
+    _longPressTriggered = false;
+    // 600ms hold triggers favorite toggle via remote
+    _longPressTimer = Timer(const Duration(milliseconds: 600), () {
+      _longPressTriggered = true;
+      widget.onToggleFavorite();
+      _showFavoriteFeedback();
+    });
+  }
+
+  void _onKeyUp(LogicalKeyboardKey key) {
+    if (!_isSelectKey(key)) return;
+
+    if (_longPressTimer != null && _longPressTimer!.isActive) {
+      _longPressTimer!.cancel();
+    }
+
+    // Normal tap: open player if long-press was not triggered
+    if (!_longPressTriggered) {
+      widget.onSelect();
+    }
+    _longPressTriggered = false;
+  }
+
+  void _showFavoriteFeedback() {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(milliseconds: 1800),
+        backgroundColor: widget.channel.isFavorite ? TVTheme.cardFocusBackground : const Color(0xFF1E293B),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(bottom: 24, left: 32, right: 32),
+        content: Row(
+          children: [
+            Icon(
+              widget.channel.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+              color: widget.channel.isFavorite ? TVTheme.gold : Colors.white70,
+              size: 24,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                widget.channel.isFavorite
+                    ? '⭐ Added "${widget.channel.name}" to Favorites'
+                    : 'Removed "${widget.channel.name}" from Favorites',
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogo() {
+    if (widget.channel.logo.isNotEmpty) {
+      return CachedNetworkImage(
+        imageUrl: widget.channel.logo,
+        fit: BoxFit.contain,
+        placeholder: (context, url) => const Center(
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: TVTheme.focusColor,
+            ),
+          ),
+        ),
+        errorWidget: (context, url, error) => _buildLogoFallback(),
+      );
+    }
+    return _buildLogoFallback();
+  }
+
+  Widget _buildLogoFallback() {
+    return Container(
+      width: 56,
+      height: 56,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.06),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white12),
+      ),
+      child: const Center(
+        child: Icon(Icons.live_tv_rounded, size: 32, color: TVTheme.focusColor),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +149,26 @@ class _TVChannelCardState extends State<TVChannelCard> {
           _isFocused = focused;
         });
       },
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent) {
+          if (_isSelectKey(event.logicalKey)) {
+            _onKeyDown(event.logicalKey);
+            return KeyEventResult.handled;
+          }
+        } else if (event is KeyUpEvent) {
+          if (_isSelectKey(event.logicalKey)) {
+            _onKeyUp(event.logicalKey);
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
       child: GestureDetector(
         onTap: widget.onSelect,
-        onLongPress: widget.onToggleFavorite,
+        onLongPress: () {
+          widget.onToggleFavorite();
+          _showFavoriteFeedback();
+        },
         child: AnimatedScale(
           scale: _isFocused ? 1.06 : 1.0,
           duration: const Duration(milliseconds: 180),
@@ -72,7 +205,7 @@ class _TVChannelCardState extends State<TVChannelCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Top row: LIVE badge + Favorite Star
+                // Top row: LIVE badge + Favorite Star Indicator (no button)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -100,20 +233,21 @@ class _TVChannelCardState extends State<TVChannelCard> {
                         ],
                       ),
                     ),
-                    IconButton(
-                      iconSize: 18,
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      icon: Icon(
-                        widget.channel.isFavorite
-                            ? Icons.star
-                            : Icons.star_border,
-                        color: widget.channel.isFavorite
-                            ? TVTheme.gold
-                            : TVTheme.textMuted,
-                      ),
-                      onPressed: widget.onToggleFavorite,
-                    ),
+                    if (widget.channel.isFavorite)
+                      Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: TVTheme.gold.withOpacity(0.18),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.star_rounded,
+                          color: TVTheme.gold,
+                          size: 18,
+                        ),
+                      )
+                    else
+                      const SizedBox(width: 24, height: 24),
                   ],
                 ),
                 const SizedBox(height: 8),
@@ -121,30 +255,7 @@ class _TVChannelCardState extends State<TVChannelCard> {
                 // Channel Logo
                 Expanded(
                   child: Center(
-                    child: widget.channel.logo.isNotEmpty
-                        ? CachedNetworkImage(
-                            imageUrl: widget.channel.logo,
-                            fit: BoxFit.contain,
-                            placeholder: (context, url) =>
-                                const Center(
-                              child: SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: TVTheme.focusColor,
-                                ),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) => Image.asset(
-                              'assets/images/tv-icon.png',
-                              fit: BoxFit.contain,
-                            ),
-                          )
-                        : Image.asset(
-                            'assets/images/tv-icon.png',
-                            fit: BoxFit.contain,
-                          ),
+                    child: _buildLogo(),
                   ),
                 ),
                 const SizedBox(height: 10),

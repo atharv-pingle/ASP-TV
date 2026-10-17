@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../models/language.dart';
 import '../theme/tv_theme.dart';
 
@@ -46,14 +47,10 @@ class TVSidebar extends StatelessWidget {
                     ],
                   ),
                   child: const Center(
-                    child: Text(
-                      'ASP',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: 0.5,
-                      ),
+                    child: Icon(
+                      Icons.live_tv_rounded,
+                      color: Colors.white,
+                      size: 22,
                     ),
                   ),
                 ),
@@ -159,6 +156,22 @@ class _TVSidebarItemState extends State<_TVSidebarItem> {
           _isFocused = focused;
         });
       },
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent) {
+          final key = event.logicalKey;
+          if (key == LogicalKeyboardKey.select ||
+              key == LogicalKeyboardKey.enter ||
+              key == LogicalKeyboardKey.numpadEnter ||
+              key == LogicalKeyboardKey.space ||
+              key == LogicalKeyboardKey.gameButtonA ||
+              key.keyId == 0x00100000017 ||
+              key.keyId == 0x00100000042) {
+            widget.onSelect();
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      },
       child: GestureDetector(
         onTap: widget.onSelect,
         child: AnimatedContainer(
@@ -192,9 +205,14 @@ class _TVSidebarItemState extends State<_TVSidebarItem> {
           ),
           child: Row(
             children: [
-              Text(
-                widget.category.icon,
-                style: const TextStyle(fontSize: 18),
+              Icon(
+                widget.category.iconData,
+                size: 20,
+                color: _isFocused
+                    ? Colors.black87
+                    : active
+                        ? TVTheme.focusColor
+                        : TVTheme.textSecondary,
               ),
               const SizedBox(width: 12),
               Expanded(

@@ -178,6 +178,7 @@ class ChannelService with ChangeNotifier {
         code: cat.code,
         name: cat.name,
         icon: cat.icon,
+        iconData: cat.iconData,
         count: count,
       );
     }).toList();

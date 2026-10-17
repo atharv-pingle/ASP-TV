@@ -3,9 +3,14 @@ name: Build ASP TV APK
 on:
   push:
     branches: [ main, master ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -41,26 +46,33 @@ jobs:
       - name: Build Release APK
         run: flutter build apk --release --verbose
 
-      - name: Upload Release APK Artifact
+      - name: Prepare Direct APK Asset
+        run: cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/ASP-TV-v1.0.0.apk
+
+      - name: Upload Release APK Artifact (Zip Backup)
         uses: actions/upload-artifact@v4
         with:
           name: ASPTV-Release-APK
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/ASP-TV-v1.0.0.apk
 
-      - name: Create GitHub Release on Tag or Dispatch
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+      - name: Publish Direct Release APK to GitHub Releases
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: build/app/outputs/flutter-apk/app-release.apk
-          name: ASP TV Live v1.0.0
+          files: build/app/outputs/flutter-apk/ASP-TV-v1.0.0.apk
+          name: ASP TV v1.0.0
           tag_name: v1.0.0
+          make_latest: true
           body: |
             ## ASP TV Live - Android TV APK 📺
             
-            - **Marathi, Hindi & English Live News**
-            - **Leanback 10-foot TV UI with Remote D-Pad Navigation**
-            - **Fullscreen 16:9 Playback with Instant ▲ / ▼ Channel Zapping**
+            - **Marathi, Hindi & English Live News Channels**
+            - **Remote D-Pad Navigation & Channel Surfing**
+            - **VU TV & Android TV Remote OK Key Selection**
+            - **Channel Up / Down Physical Remote Buttons Supported**
+            - **Video Stretch & Fill Screen Aspect Ratio Mode**
+            - **Hold OK / Long-Press on any channel to Add to Favorites**
             
-            Download `app-release.apk` below and install it directly on your Android TV or Fire TV Stick.
+            👉 **Direct Download**: Download `ASP-TV-v1.0.0.apk` below directly to install on your Android TV or Fire TV Stick.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

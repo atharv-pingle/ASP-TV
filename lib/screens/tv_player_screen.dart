@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/channel.dart';
 import '../services/channel_service.dart';
 import '../theme/tv_theme.dart';
 import '../widgets/tv_quick_guide.dart';
+
+enum VideoScaleMode { stretch, fit, zoom }
 
 class TVPlayerScreen extends StatefulWidget {
   final Channel initialChannel;
@@ -36,13 +39,37 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
   Timer? _osdTimer;
   bool _showQuickGuide = false;
 
+  VideoScaleMode _scaleMode = VideoScaleMode.stretch;
+  String _hudMessage = '';
+  Timer? _hudTimer;
+
   final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _currentChannel = widget.initialChannel;
+    _loadScaleModePreference();
     _playChannel(_currentChannel);
+  }
+
+  void _loadScaleModePreference() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final modeIdx = prefs.getInt('asp_tv_scale_mode') ?? 0; // Default: stretch
+      if (mounted) {
+        setState(() {
+          _scaleMode = VideoScaleMode.values[modeIdx.clamp(0, VideoScaleMode.values.length - 1)];
+        });
+      }
+    } catch (_) {}
+  }
+
+  void _saveScaleModePreference() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('asp_tv_scale_mode', _scaleMode.index);
+    } catch (_) {}
   }
 
   void _playChannel(Channel channel) {
@@ -139,6 +166,62 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
     }
   }
 
+  void _cycleScaleMode() {
+    setState(() {
+      switch (_scaleMode) {
+        case VideoScaleMode.stretch:
+          _scaleMode = VideoScaleMode.fit;
+          break;
+        case VideoScaleMode.fit:
+          _scaleMode = VideoScaleMode.zoom;
+          break;
+        case VideoScaleMode.zoom:
+          _scaleMode = VideoScaleMode.stretch;
+          break;
+      }
+      _showOsd = true;
+    });
+    _triggerHud('Display: ${_getScaleModeLabel()}');
+    _scheduleOsdHide();
+    _saveScaleModePreference();
+  }
+
+  void _triggerHud(String message) {
+    _hudTimer?.cancel();
+    setState(() {
+      _hudMessage = message;
+    });
+    _hudTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _hudMessage = '';
+        });
+      }
+    });
+  }
+
+  String _getScaleModeLabel() {
+    switch (_scaleMode) {
+      case VideoScaleMode.stretch:
+        return 'Stretch (Full Screen)';
+      case VideoScaleMode.fit:
+        return 'Fit (Original 16:9)';
+      case VideoScaleMode.zoom:
+        return 'Zoom (Crop)';
+    }
+  }
+
+  IconData _getScaleModeIcon() {
+    switch (_scaleMode) {
+      case VideoScaleMode.stretch:
+        return Icons.aspect_ratio_rounded;
+      case VideoScaleMode.fit:
+        return Icons.fit_screen_rounded;
+      case VideoScaleMode.zoom:
+        return Icons.zoom_out_map_rounded;
+    }
+  }
+
   void _scheduleOsdHide() {
     _osdTimer?.cancel();
     _osdTimer = Timer(const Duration(seconds: 4), () {
@@ -169,24 +252,45 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
-    // Up Arrow: Prev Channel (TV Zapping)
-    if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+    final key = event.logicalKey;
+
+    // Detect Channel Up (CH+ / PageUp / ArrowUp / keycode 166)
+    final isChannelUp = key == LogicalKeyboardKey.channelUp ||
+        key == LogicalKeyboardKey.pageUp ||
+        key == LogicalKeyboardKey.arrowUp ||
+        key.keyId == 0x001000000a6 || // KEYCODE_CHANNEL_UP
+        key.keyLabel.toLowerCase().contains('channel up');
+
+    // Detect Channel Down (CH- / PageDown / ArrowDown / keycode 167)
+    final isChannelDown = key == LogicalKeyboardKey.channelDown ||
+        key == LogicalKeyboardKey.pageDown ||
+        key == LogicalKeyboardKey.arrowDown ||
+        key.keyId == 0x001000000a7 || // KEYCODE_CHANNEL_DOWN
+        key.keyLabel.toLowerCase().contains('channel down');
+
+    // Channel Switching
+    if (isChannelUp) {
       if (!_showQuickGuide) {
         _prevChannel();
         return KeyEventResult.handled;
       }
     }
 
-    // Down Arrow: Next Channel (TV Zapping)
-    if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+    if (isChannelDown) {
       if (!_showQuickGuide) {
         _nextChannel();
         return KeyEventResult.handled;
       }
     }
 
-    // Left/Right Arrow: Switch stream mirror if available
-    if (event.logicalKey == LogicalKeyboardKey.arrowRight && !_showQuickGuide) {
+    // Left Arrow: Cycle Video Stretch / Fit mode
+    if (key == LogicalKeyboardKey.arrowLeft && !_showQuickGuide) {
+      _cycleScaleMode();
+      return KeyEventResult.handled;
+    }
+
+    // Right Arrow: Switch stream mirror if available
+    if (key == LogicalKeyboardKey.arrowRight && !_showQuickGuide) {
       if (_currentChannel.streams.length > 1) {
         _cycleStreamMirror();
         return KeyEventResult.handled;
@@ -194,9 +298,15 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
     }
 
     // Select / OK / Enter: Toggle Quick Guide
-    if (event.logicalKey == LogicalKeyboardKey.select ||
-        event.logicalKey == LogicalKeyboardKey.enter ||
-        event.logicalKey == LogicalKeyboardKey.space) {
+    if (key == LogicalKeyboardKey.select ||
+        key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter ||
+        key == LogicalKeyboardKey.space ||
+        key == LogicalKeyboardKey.gameButtonA ||
+        key.keyId == 0x00100000017 || // KEYCODE_DPAD_CENTER
+        key.keyId == 0x00100000042 || // KEYCODE_ENTER
+        key.keyLabel.toLowerCase() == 'select' ||
+        key.keyLabel.toLowerCase() == 'enter') {
       setState(() {
         _showQuickGuide = !_showQuickGuide;
         _showOsd = true;
@@ -206,8 +316,8 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
     }
 
     // Back / Escape: Exit quick guide or return to Home
-    if (event.logicalKey == LogicalKeyboardKey.escape ||
-        event.logicalKey == LogicalKeyboardKey.goBack) {
+    if (key == LogicalKeyboardKey.escape ||
+        key == LogicalKeyboardKey.goBack) {
       if (_showQuickGuide) {
         setState(() {
           _showQuickGuide = false;
@@ -223,10 +333,58 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
   @override
   void dispose() {
     _osdTimer?.cancel();
+    _hudTimer?.cancel();
     _controller?.removeListener(_checkStreamHealth);
     _controller?.dispose();
     _focusNode.dispose();
     super.dispose();
+  }
+
+  Widget _buildVideo() {
+    final c = _controller;
+    if (c == null || !c.value.isInitialized) {
+      return const SizedBox.shrink();
+    }
+
+    final videoWidth = c.value.size.width > 0 ? c.value.size.width : 16.0;
+    final videoHeight = c.value.size.height > 0 ? c.value.size.height : 9.0;
+    final aspectRatio = c.value.aspectRatio > 0 ? c.value.aspectRatio : 16 / 9;
+
+    switch (_scaleMode) {
+      case VideoScaleMode.stretch:
+        // Stretch video to fit full 16:9 screen edge-to-edge
+        return SizedBox.expand(
+          child: FittedBox(
+            fit: BoxFit.fill,
+            child: SizedBox(
+              width: videoWidth,
+              height: videoHeight,
+              child: VideoPlayer(c),
+            ),
+          ),
+        );
+      case VideoScaleMode.zoom:
+        // Fill screen preserving aspect ratio (crop edges)
+        return SizedBox.expand(
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: SizedBox(
+              width: videoWidth,
+              height: videoHeight,
+              child: VideoPlayer(c),
+            ),
+          ),
+        );
+      case VideoScaleMode.fit:
+      default:
+        // Preserve native broadcast aspect ratio
+        return Center(
+          child: AspectRatio(
+            aspectRatio: aspectRatio,
+            child: VideoPlayer(c),
+          ),
+        );
+    }
   }
 
   @override
@@ -249,19 +407,46 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // 1. Fullscreen Video Player (16:9 Aspect Ratio)
-              Center(
-                child: _controller != null && _controller!.value.isInitialized
-                    ? AspectRatio(
-                        aspectRatio: _controller!.value.aspectRatio > 0
-                            ? _controller!.value.aspectRatio
-                            : 16 / 9,
-                        child: VideoPlayer(_controller!),
-                      )
-                    : const SizedBox.shrink(),
-              ),
+              // 1. Fullscreen Video with Stretch & Fit support
+              _buildVideo(),
 
-              // 2. Loading Spinner
+              // 2. HUD Banner for Aspect Ratio / Mode changes
+              if (_hudMessage.isNotEmpty)
+                Positioned(
+                  top: 36,
+                  right: 36,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.black87,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: TVTheme.focusColor, width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: TVTheme.focusColor.withOpacity(0.3),
+                          blurRadius: 12,
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(_getScaleModeIcon(), color: TVTheme.focusColor, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          _hudMessage,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+              // 3. Loading Spinner
               if (_isLoading)
                 Container(
                   color: Colors.black45,
@@ -287,7 +472,7 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                   ),
                 ),
 
-              // 3. Stream Error State
+              // 4. Stream Error State
               if (_hasError)
                 Container(
                   color: Colors.black87,
@@ -331,25 +516,11 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                               label: const Text('Retry Stream'),
                               onPressed: _startStream,
                             ),
-                            if (_currentChannel.streams.length > 1) ...[
-                              const SizedBox(width: 16),
-                              ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white24,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 12),
-                                ),
-                                icon: const Icon(Icons.swap_horiz),
-                                label: Text('Try Mirror (${_currentStreamIndex + 1}/${_currentChannel.streams.length})'),
-                                onPressed: _cycleStreamMirror,
-                              ),
-                            ],
                             const SizedBox(width: 16),
                             OutlinedButton.icon(
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.white,
-                                side: const BorderSide(color: Colors.white30),
+                                side: const BorderSide(color: Colors.white24),
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 20, vertical: 12),
                               ),
@@ -364,19 +535,21 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                   ),
                 ),
 
-              // 4. On-Screen Display (OSD Banner at Bottom)
+              // 5. Leanback TV Player OSD (Bottom Navigation Overlay)
               if (_showOsd)
                 Positioned(
-                  left: 24,
-                  right: 24,
-                  bottom: 24,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xE60F172A),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white12),
-                      boxShadow: const [
+                    padding: const EdgeInsets.fromLTRB(28, 20, 28, 24),
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.transparent, Colors.black87, Colors.black],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      boxShadow: [
                         BoxShadow(
                           color: Colors.black87,
                           blurRadius: 20,
@@ -414,9 +587,12 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                             child: CachedNetworkImage(
                               imageUrl: _currentChannel.logo,
                               fit: BoxFit.contain,
-                              errorWidget: (context, url, error) => Image.asset(
-                                'assets/images/tv-icon.png',
-                                fit: BoxFit.contain,
+                              errorWidget: (context, url, error) => Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(Icons.live_tv_rounded, size: 28, color: TVTheme.focusColor),
                               ),
                             ),
                           ),
@@ -463,13 +639,58 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                                       color: TVTheme.textSecondary,
                                     ),
                                   ),
+                                  const SizedBox(width: 12),
+
+                                  // Video Stretch / Scale Mode Button
+                                  GestureDetector(
+                                    onTap: _cycleScaleMode,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 9, vertical: 3),
+                                      decoration: BoxDecoration(
+                                        color: _scaleMode == VideoScaleMode.stretch
+                                            ? TVTheme.focusColor
+                                            : Colors.white.withOpacity(0.12),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(
+                                          color: _scaleMode == VideoScaleMode.stretch
+                                              ? Colors.white
+                                              : TVTheme.focusColor.withOpacity(0.5),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            _getScaleModeIcon(),
+                                            size: 14,
+                                            color: _scaleMode == VideoScaleMode.stretch
+                                                ? Colors.black87
+                                                : Colors.white,
+                                          ),
+                                          const SizedBox(width: 5),
+                                          Text(
+                                            _getScaleModeLabel(),
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: _scaleMode == VideoScaleMode.stretch
+                                                  ? Colors.black87
+                                                  : Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+
                                   if (_currentChannel.streams.length > 1) ...[
-                                    const SizedBox(width: 12),
+                                    const SizedBox(width: 10),
                                     GestureDetector(
                                       onTap: _cycleStreamMirror,
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 2),
+                                            horizontal: 8, vertical: 3),
                                         decoration: BoxDecoration(
                                           color: TVTheme.focusColor.withOpacity(0.15),
                                           borderRadius: BorderRadius.circular(6),
@@ -477,7 +698,7 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                                               color: TVTheme.focusColor.withOpacity(0.4)),
                                         ),
                                         child: Text(
-                                          '⚡ Stream ${_currentStreamIndex + 1}/${_currentChannel.streams.length} (Tap / ► to Switch)',
+                                          '⚡ Stream ${_currentStreamIndex + 1}/${_currentChannel.streams.length}',
                                           style: const TextStyle(
                                             fontSize: 11,
                                             fontWeight: FontWeight.w600,
@@ -486,7 +707,7 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                                         ),
                                       ),
                                     ),
-                                  ]
+                                  ],
                                 ],
                               ),
                             ],
@@ -497,11 +718,13 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                         Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            _buildKeyHint('▲ / ▼', 'Change Channel'),
-                            const SizedBox(width: 14),
+                            _buildKeyHint('◄', 'Stretch'),
+                            const SizedBox(width: 12),
+                            _buildKeyHint('CH ▲/▼', 'Channel'),
+                            const SizedBox(width: 12),
                             _buildKeyHint('OK', 'Guide'),
-                            const SizedBox(width: 14),
-                            _buildKeyHint('BACK', 'Exit'),
+                            const SizedBox(width: 12),
+                            _buildKeyHint('BACK', 'Home'),
                           ],
                         ),
                       ],
@@ -509,7 +732,7 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                   ),
                 ),
 
-              // 5. Quick Channel Guide Drawer Overlay (Side Sheet)
+              // 6. Quick Channel Guide Drawer Overlay (Side Sheet)
               if (_showQuickGuide)
                 Positioned(
                   top: 0,
