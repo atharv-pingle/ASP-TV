@@ -46,22 +46,31 @@ jobs:
       - name: Build Release APK
         run: flutter build apk --release --verbose
 
+      - name: Extract App Version from pubspec.yaml
+        id: versioning
+        run: |
+          APP_VER=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+          BUILD_NUM=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f2)
+          echo "app_version=v$APP_VER" >> $GITHUB_OUTPUT
+          echo "apk_file=ASP-TV-v$APP_VER.apk" >> $GITHUB_OUTPUT
+          echo "Extracted App Version: v$APP_VER+$BUILD_NUM"
+
       - name: Prepare Direct APK Asset
-        run: cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/ASP-TV-v1.0.0.apk
+        run: cp build/app/outputs/flutter-apk/app-release.apk "build/app/outputs/flutter-apk/${{ steps.versioning.outputs.apk_file }}"
 
       - name: Upload Release APK Artifact (Zip Backup)
         uses: actions/upload-artifact@v4
         with:
           name: ASPTV-Release-APK
-          path: build/app/outputs/flutter-apk/ASP-TV-v1.0.0.apk
+          path: "build/app/outputs/flutter-apk/${{ steps.versioning.outputs.apk_file }}"
 
       - name: Publish Direct Release APK to GitHub Releases
         if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: build/app/outputs/flutter-apk/ASP-TV-v1.0.0.apk
-          name: ASP TV v1.0.0
-          tag_name: v1.0.0
+          files: "build/app/outputs/flutter-apk/${{ steps.versioning.outputs.apk_file }}"
+          name: "ASP TV ${{ steps.versioning.outputs.app_version }}"
+          tag_name: "${{ steps.versioning.outputs.app_version }}"
           make_latest: true
           body: |
             ## ASP TV Live - Android TV APK 📺

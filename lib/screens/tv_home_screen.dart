@@ -124,10 +124,9 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                       // Active category title & badge
                       Row(
                         children: [
-                          Icon(
-                            activeCat.iconData,
-                            size: 24,
-                            color: TVTheme.focusColor,
+                          Text(
+                            activeCat.icon,
+                            style: const TextStyle(fontSize: 22),
                           ),
                           const SizedBox(width: 10),
                           Text(

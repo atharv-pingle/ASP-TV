@@ -205,14 +205,9 @@ class _TVSidebarItemState extends State<_TVSidebarItem> {
           ),
           child: Row(
             children: [
-              Icon(
-                widget.category.iconData,
-                size: 20,
-                color: _isFocused
-                    ? Colors.black87
-                    : active
-                        ? TVTheme.focusColor
-                        : TVTheme.textSecondary,
+              Text(
+                widget.category.icon,
+                style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(width: 12),
               Expanded(

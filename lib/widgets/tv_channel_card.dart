@@ -109,13 +109,19 @@ class _TVChannelCardState extends State<TVChannelCard> {
       return CachedNetworkImage(
         imageUrl: widget.channel.logo,
         fit: BoxFit.contain,
-        placeholder: (context, url) => const Center(
+        httpHeaders: const {
+          'User-Agent':
+              'Mozilla/5.0 (Linux; Android 12; Android TV; Build/STT2.220920.015) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+        },
+        memCacheWidth: 400,
+        placeholder: (context, url) => Center(
           child: SizedBox(
-            width: 24,
-            height: 24,
+            width: 28,
+            height: 28,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              color: TVTheme.focusColor,
+              color: TVTheme.focusColor.withOpacity(0.5),
             ),
           ),
         ),
@@ -126,16 +132,33 @@ class _TVChannelCardState extends State<TVChannelCard> {
   }
 
   Widget _buildLogoFallback() {
+    final initials = widget.channel.name.trim().isNotEmpty
+        ? widget.channel.name.trim().split(' ').map((e) => e.isNotEmpty ? e[0] : '').take(3).join()
+        : 'TV';
+
     return Container(
-      width: 56,
-      height: 56,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.06),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.white12),
       ),
-      child: const Center(
-        child: Icon(Icons.live_tv_rounded, size: 32, color: TVTheme.focusColor),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.live_tv_rounded, size: 36, color: TVTheme.focusColor),
+          const SizedBox(height: 6),
+          Text(
+            initials.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+              color: Colors.white70,
+              letterSpacing: 1.2,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -170,7 +193,7 @@ class _TVChannelCardState extends State<TVChannelCard> {
           _showFavoriteFeedback();
         },
         child: AnimatedScale(
-          scale: _isFocused ? 1.06 : 1.0,
+          scale: _isFocused ? 1.05 : 1.0,
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
           child: AnimatedContainer(
@@ -201,98 +224,59 @@ class _TVChannelCardState extends State<TVChannelCard> {
                       )
                     ],
             ),
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
+            child: Stack(
               children: [
-                // Top row: LIVE badge + Favorite Star Indicator (no button)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                // Main Content: Prominent Logo + Channel Name Text Underneath
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  child: Column(
+                    children: [
+                      // Prominent Channel Logo
+                      Expanded(
+                        child: Center(
+                          child: _buildLogo(),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Channel Name Text Underneath
+                      Text(
+                        widget.channel.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight:
+                              _isFocused ? FontWeight.bold : FontWeight.w600,
+                          color: _isFocused
+                              ? TVTheme.focusColor
+                              : TVTheme.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Subtle Favorite Star Indicator (Top Right)
+                if (widget.channel.isFavorite)
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: TVTheme.accentRed,
-                        borderRadius: BorderRadius.circular(4),
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: TVTheme.gold.withOpacity(0.5), width: 1),
                       ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.circle, size: 6, color: Colors.white),
-                          SizedBox(width: 4),
-                          Text(
-                            'LIVE',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ],
+                      child: const Icon(
+                        Icons.star_rounded,
+                        color: TVTheme.gold,
+                        size: 16,
                       ),
                     ),
-                    if (widget.channel.isFavorite)
-                      Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: TVTheme.gold.withOpacity(0.18),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.star_rounded,
-                          color: TVTheme.gold,
-                          size: 18,
-                        ),
-                      )
-                    else
-                      const SizedBox(width: 24, height: 24),
-                  ],
-                ),
-                const SizedBox(height: 8),
-
-                // Channel Logo
-                Expanded(
-                  child: Center(
-                    child: _buildLogo(),
                   ),
-                ),
-                const SizedBox(height: 10),
-
-                // Channel Name
-                Text(
-                  widget.channel.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight:
-                        _isFocused ? FontWeight.bold : FontWeight.w600,
-                    color: _isFocused
-                        ? TVTheme.focusColor
-                        : TVTheme.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-
-                // Language Pill
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.black38,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    widget.channel.languageName,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: TVTheme.textSecondary,
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
