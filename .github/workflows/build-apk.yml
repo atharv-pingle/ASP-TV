@@ -72,6 +72,7 @@ jobs:
           name: "ASP TV ${{ steps.versioning.outputs.app_version }}"
           tag_name: "${{ steps.versioning.outputs.app_version }}"
           make_latest: true
+          overwrite: true
           body: |
             ## ASP TV Live - Android TV APK 📺
             
@@ -82,6 +83,6 @@ jobs:
             - **Video Stretch & Fill Screen Aspect Ratio Mode**
             - **Hold OK / Long-Press on any channel to Add to Favorites**
             
-            👉 **Direct Download**: Download `ASP-TV-v1.0.0.apk` below directly to install on your Android TV or Fire TV Stick.
+            👉 **Direct Download**: Download `${{ steps.versioning.outputs.apk_file }}` below directly to install on your Android TV or Fire TV Stick.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

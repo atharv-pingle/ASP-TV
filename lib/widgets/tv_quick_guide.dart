@@ -158,17 +158,23 @@ class _QuickGuideItemState extends State<_QuickGuideItem> {
                 width: 32,
                 height: 32,
                 child: widget.channel.logo.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: widget.channel.logo,
-                        fit: BoxFit.contain,
-                        errorWidget: (context, url, error) => Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Icon(Icons.live_tv_rounded, size: 18, color: TVTheme.focusColor),
-                        ),
-                      )
+                    ? (widget.channel.logo.startsWith('assets/')
+                        ? Image.asset(widget.channel.logo, fit: BoxFit.contain)
+                        : CachedNetworkImage(
+                            imageUrl: widget.channel.logo,
+                            fit: BoxFit.contain,
+                            httpHeaders: const {
+                              'User-Agent':
+                                  'Mozilla/5.0 (Linux; Android 12; Android TV; Build/STT2.220920.015) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                            },
+                            errorWidget: (context, url, error) => Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.08),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Icon(Icons.live_tv_rounded, size: 18, color: TVTheme.focusColor),
+                            ),
+                          ))
                     : Container(
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.08),

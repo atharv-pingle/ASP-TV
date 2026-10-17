@@ -62,7 +62,7 @@
     "language_code": "mar",
     "language_name": "Marathi",
     "network": "Network18",
-    "logo": "https://images.news18.com/dlxczavtqcctuei/news18/static/images/marathi/NEWS_18_Marathi_Logo.svg",
+    "logo": "assets/images/news18_marathi.png",
     "streams": [
       "https://n18syndication.akamaized.net/bpk-tv/News18_Lokmat_NW18_MOB/output01/master.m3u8"
     ]
@@ -1371,7 +1371,7 @@
     "language_code": "eng",
     "language_name": "English",
     "network": "",
-    "logo": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Russia-today-logo.svg",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Russia-today-logo.svg/512px-Russia-today-logo.svg.png",
     "streams": [
       "https://rt-india.rttv.com/dvr/rtindia/playlist.m3u8",
       "https://mumbai-edge.smartplaytv.in/RTIndia/index.m3u8"

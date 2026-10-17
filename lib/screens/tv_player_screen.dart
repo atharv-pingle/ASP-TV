@@ -629,17 +629,33 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                           SizedBox(
                             width: 48,
                             height: 48,
-                            child: CachedNetworkImage(
-                              imageUrl: _currentChannel.logo,
-                              fit: BoxFit.contain,
-                              errorWidget: (context, url, error) => Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.08),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(Icons.live_tv_rounded, size: 28, color: TVTheme.focusColor),
-                              ),
-                            ),
+                            child: _currentChannel.logo.startsWith('assets/')
+                                ? Image.asset(
+                                    _currentChannel.logo,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (context, error, stackTrace) => Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.08),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(Icons.live_tv_rounded, size: 28, color: TVTheme.focusColor),
+                                    ),
+                                  )
+                                : CachedNetworkImage(
+                                    imageUrl: _currentChannel.logo,
+                                    fit: BoxFit.contain,
+                                    httpHeaders: const {
+                                      'User-Agent':
+                                          'Mozilla/5.0 (Linux; Android 12; Android TV; Build/STT2.220920.015) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                                    },
+                                    errorWidget: (context, url, error) => Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.08),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(Icons.live_tv_rounded, size: 28, color: TVTheme.focusColor),
+                                    ),
+                                  ),
                           ),
                         const SizedBox(width: 16),
 

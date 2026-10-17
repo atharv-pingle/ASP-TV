@@ -106,6 +106,13 @@ class _TVChannelCardState extends State<TVChannelCard> {
 
   Widget _buildLogo() {
     if (widget.channel.logo.isNotEmpty) {
+      if (widget.channel.logo.startsWith('assets/')) {
+        return Image.asset(
+          widget.channel.logo,
+          fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) => _buildLogoFallback(),
+        );
+      }
       return CachedNetworkImage(
         imageUrl: widget.channel.logo,
         fit: BoxFit.contain,
