@@ -842,28 +842,6 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                                 ],
                               ),
                             ),
-
-                            // Dynamic TV Remote Hints
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: _showBottomBar
-                                  ? [
-                                      _buildKeyHint('◄ / ►', 'Navigate'),
-                                      const SizedBox(width: 10),
-                                      _buildKeyHint('OK', 'Select'),
-                                      const SizedBox(width: 10),
-                                      _buildKeyHint('▲ / BACK', 'Hide Menu'),
-                                    ]
-                                  : [
-                                      _buildKeyHint('▼', 'Controls Menu'),
-                                      const SizedBox(width: 10),
-                                      _buildKeyHint('OK', 'Guide'),
-                                      const SizedBox(width: 10),
-                                      _buildKeyHint('CH ▲/▼', 'Channel'),
-                                      const SizedBox(width: 10),
-                                      _buildKeyHint('BACK', 'Home'),
-                                    ],
-                            ),
                           ],
                         ),
 
@@ -969,37 +947,6 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildKeyHint(String keyLabel, String action) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            keyLabel,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: TVTheme.focusColor,
-            ),
-          ),
-          const SizedBox(width: 6),
-          Text(
-            action,
-            style: const TextStyle(
-              fontSize: 11,
-              color: TVTheme.textSecondary,
-            ),
-          ),
-        ],
       ),
     );
   }

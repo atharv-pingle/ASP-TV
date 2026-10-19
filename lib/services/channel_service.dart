@@ -16,11 +16,13 @@ class ChannelService with ChangeNotifier {
   Set<String> _favoriteIds = {};
   List<String> _recentChannelIds = [];
   String _selectedLanguage = 'all';
+  String _selectedCategory = 'all';
   String _searchQuery = '';
   bool _isLoading = true;
 
   List<Channel> get allChannels => _allChannels;
   String get selectedLanguage => _selectedLanguage;
+  String get selectedCategory => _selectedCategory;
   String get searchQuery => _searchQuery;
   bool get isLoading => _isLoading;
 
@@ -123,6 +125,12 @@ class ChannelService with ChangeNotifier {
 
   void selectLanguage(String code) {
     _selectedLanguage = code;
+    _selectedCategory = 'all'; // Default to all channels in selected language
+    notifyListeners();
+  }
+
+  void selectCategory(String category) {
+    _selectedCategory = category;
     notifyListeners();
   }
 
@@ -168,11 +176,29 @@ class ChannelService with ChangeNotifier {
   List<Channel> get filteredChannels {
     List<Channel> list = _allChannels;
 
-    // Filter by language
+    // Filter by language / section
     if (_selectedLanguage == 'fav') {
       list = list.where((c) => c.isFavorite).toList();
+    } else if (_selectedLanguage == 'kids') {
+      list = list.where((c) =>
+          c.category.toLowerCase() == 'kids' &&
+          (c.languageCode == 'hin' || c.languageCode == 'eng' || c.languageCode == 'mar')
+      ).toList();
+    } else if (_selectedLanguage == 'infotainment') {
+      list = list.where((c) =>
+          c.category.toLowerCase() == 'infotainment' &&
+          (c.languageCode == 'hin' || c.languageCode == 'eng' || c.languageCode == 'mar')
+      ).toList();
     } else if (_selectedLanguage != 'all') {
       list = list.where((c) => c.languageCode == _selectedLanguage).toList();
+    }
+
+    // Filter by category within language
+    if (_selectedCategory != 'all' &&
+        _selectedLanguage != 'fav' &&
+        _selectedLanguage != 'kids' &&
+        _selectedLanguage != 'infotainment') {
+      list = list.where((c) => c.category.toLowerCase() == _selectedCategory.toLowerCase()).toList();
     }
 
     // Filter by search query
@@ -182,6 +208,7 @@ class ChannelService with ChangeNotifier {
           .where((c) =>
               c.name.toLowerCase().contains(query) ||
               c.languageName.toLowerCase().contains(query) ||
+              c.category.toLowerCase().contains(query) ||
               c.network.toLowerCase().contains(query))
           .toList();
     }
@@ -197,18 +224,41 @@ class ChannelService with ChangeNotifier {
 
     return LanguageCategory.defaultCategories.map((cat) {
       int count = 0;
+      List<GenreCategory> genres = [];
+
       if (cat.code == 'all') {
         count = _allChannels.length;
       } else if (cat.code == 'fav') {
         count = _favoriteIds.length;
+      } else if (cat.code == 'kids') {
+        count = _allChannels.where((c) =>
+            c.category == 'kids' &&
+            (c.languageCode == 'hin' || c.languageCode == 'eng' || c.languageCode == 'mar')).length;
+      } else if (cat.code == 'infotainment') {
+        count = _allChannels.where((c) =>
+            c.category == 'infotainment' &&
+            (c.languageCode == 'hin' || c.languageCode == 'eng' || c.languageCode == 'mar')).length;
       } else {
         count = counts[cat.code] ?? 0;
+        final langChannels = _allChannels.where((c) => c.languageCode == cat.code).toList();
+        final newsCount = langChannels.where((c) => c.category == 'news').length;
+        final entCount = langChannels.where((c) => c.category == 'entertainment').length;
+        final moviesCount = langChannels.where((c) => c.category == 'movies').length;
+        final musicCount = langChannels.where((c) => c.category == 'music').length;
+        genres = [
+          GenreCategory(code: 'news', name: 'News', icon: '📰', count: newsCount),
+          GenreCategory(code: 'entertainment', name: 'Entertainment', icon: '🎭', count: entCount),
+          GenreCategory(code: 'movies', name: 'Movies', icon: '🎬', count: moviesCount),
+          GenreCategory(code: 'music', name: 'Music', icon: '🎵', count: musicCount),
+        ];
       }
+
       return LanguageCategory(
         code: cat.code,
         name: cat.name,
         icon: cat.icon,
         count: count,
+        genres: genres,
       );
     }).toList();
   }

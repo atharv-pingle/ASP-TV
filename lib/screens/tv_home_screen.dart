@@ -133,8 +133,12 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
             TVSidebar(
               categories: categories,
               selectedCategory: service.selectedLanguage,
+              selectedGenre: service.selectedCategory,
               onCategorySelected: (catCode) {
                 service.selectLanguage(catCode);
+              },
+              onGenreSelected: (genreCode) {
+                service.selectCategory(genreCode);
               },
             ),
 
@@ -162,7 +166,9 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                   ? 'Favorite Channels'
                                   : activeCat.code == 'all'
                                       ? 'All Channels'
-                                      : '${activeCat.name} News',
+                                      : service.selectedCategory == 'all'
+                                          ? '${activeCat.name} Channels'
+                                          : '${activeCat.name} ${service.selectedCategory == 'news' ? 'News' : service.selectedCategory == 'movies' ? 'Movies' : 'Entertainment'}',
                               style: const TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
@@ -287,90 +293,105 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                     ),
                   ),
 
-                  // Optional "Recently Watched" Row
-                  if (service.searchQuery.isEmpty && recents.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Row(
-                            children: [
-                              Icon(Icons.history_rounded, size: 16, color: TVTheme.focusColor),
-                              SizedBox(width: 6),
-                              Text(
-                                'Recently Watched',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                  color: TVTheme.textPrimary,
-                                  letterSpacing: 0.3,
-                                ),
+                  // Unified Smooth-Scrolling Content Area
+                  Expanded(
+                    child: CustomScrollView(
+                      slivers: [
+                        // Recently Watched Section (Moves naturally upward with scrolling)
+                        if (service.searchQuery.isEmpty && recents.isNotEmpty)
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Row(
+                                    children: [
+                                      Icon(Icons.history_rounded, size: 16, color: TVTheme.focusColor),
+                                      SizedBox(width: 6),
+                                      Text(
+                                        'Recently Watched',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: TVTheme.textPrimary,
+                                          letterSpacing: 0.3,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  SizedBox(
+                                    height: 78,
+                                    child: ListView.separated(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: recents.length,
+                                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                                      itemBuilder: (context, index) {
+                                        final ch = recents[index];
+                                        return _TVRecentChannelCard(
+                                          channel: ch,
+                                          onSelect: () => _openPlayer(ch, recents),
+                                          onToggleFavorite: () => service.toggleFavorite(ch),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          SizedBox(
-                            height: 78,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: recents.length,
-                              separatorBuilder: (_, __) => const SizedBox(width: 12),
-                              itemBuilder: (context, index) {
-                                final ch = recents[index];
-                                return _TVRecentChannelCard(
-                                  channel: ch,
-                                  onSelect: () => _openPlayer(ch, recents),
-                                  onToggleFavorite: () => service.toggleFavorite(ch),
-                                );
-                              },
                             ),
                           ),
-                        ],
-                      ),
-                    ),
 
-                  // Channels Grid
-                  Expanded(
-                    child: channels.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.tv_off_rounded, size: 64, color: TVTheme.textMuted),
-                                const SizedBox(height: 16),
-                                Text(
-                                  service.selectedLanguage == 'fav'
-                                      ? 'No favorite channels yet.\nPress and hold or click the star on any channel to add it.'
-                                      : 'No channels match "${service.searchQuery}"',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: TVTheme.textSecondary,
+                        // Channel Grid or Empty State
+                        if (channels.isEmpty)
+                          SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.tv_off_rounded, size: 64, color: TVTheme.textMuted),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    service.selectedLanguage == 'fav'
+                                        ? 'No favorite channels yet.\nPress and hold or click the star on any channel to add it.'
+                                        : 'No channels match "${service.searchQuery}"',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: TVTheme.textSecondary,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           )
-                        : GridView.builder(
-                            padding: const EdgeInsets.fromLTRB(24, 4, 24, 24),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 4, // 4-column TV grid
-                              childAspectRatio: 1.25,
-                              crossAxisSpacing: 18,
-                              mainAxisSpacing: 18,
+                        else
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                            sliver: SliverGrid(
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 4, // 4-column TV grid
+                                childAspectRatio: 1.25,
+                                crossAxisSpacing: 18,
+                                mainAxisSpacing: 18,
+                              ),
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  final channel = channels[index];
+                                  return TVChannelCard(
+                                    channel: channel,
+                                    autoFocus: index == 0 && recents.isEmpty,
+                                    onSelect: () => _openPlayer(channel, channels),
+                                    onToggleFavorite: () => service.toggleFavorite(channel),
+                                  );
+                                },
+                                childCount: channels.length,
+                              ),
                             ),
-                            itemCount: channels.length,
-                            itemBuilder: (context, index) {
-                              final channel = channels[index];
-                              return TVChannelCard(
-                                channel: channel,
-                                autoFocus: index == 0 && recents.isEmpty,
-                                onSelect: () => _openPlayer(channel, channels),
-                                onToggleFavorite: () => service.toggleFavorite(channel),
-                              );
-                            },
                           ),
+                      ],
+                    ),
                   ),
                 ],
               ),

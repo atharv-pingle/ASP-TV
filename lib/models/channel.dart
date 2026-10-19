@@ -5,6 +5,7 @@ class Channel {
   final String languageName;
   final String network;
   final String logo;
+  final String category;
   final List<String> streams;
   bool isFavorite;
 
@@ -15,6 +16,7 @@ class Channel {
     required this.languageName,
     this.network = '',
     required this.logo,
+    this.category = 'news',
     required this.streams,
     this.isFavorite = false,
   });
@@ -42,6 +44,7 @@ class Channel {
       languageName: json['language_name']?.toString().trim() ?? 'Hindi',
       network: json['network']?.toString().trim() ?? '',
       logo: json['logo']?.toString().trim() ?? '',
+      category: json['category']?.toString().trim().toLowerCase() ?? 'news',
       streams: streamList,
       isFavorite: json['isFavorite'] == true,
     );
@@ -55,6 +58,7 @@ class Channel {
       'language_name': languageName,
       'network': network,
       'logo': logo,
+      'category': category,
       'streams': streams,
       'isFavorite': isFavorite,
     };
