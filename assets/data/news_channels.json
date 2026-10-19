@@ -67,7 +67,7 @@
     "language_code": "mar",
     "language_name": "Marathi",
     "network": "Network18",
-    "logo": "assets/images/news18_marathi.png",
+    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/News18Lokmat.png",
     "streams": [
       "https://n18syndication.akamaized.net/bpk-tv/News18_Lokmat_NW18_MOB/output01/master.m3u8"
     ],
@@ -1559,7 +1559,7 @@
     "language_code": "mar",
     "language_name": "Marathi",
     "network": "Shemaroo",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Shemaroo_MarathiBana.png",
+    "logo": "https://dtil.tmsimg.com/assets/s143777_ld_h15_aa.png?lock=720x540",
     "category": "movies",
     "streams": [
       "https://airtelapp.shemaroo.com/marathibana/smil:marathibanaadp.smil/playlist.m3u8",
@@ -1572,7 +1572,7 @@
     "language_code": "mar",
     "language_name": "Marathi",
     "network": "Zee",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Zee_Talkies.png",
+    "logo": "https://dtil.tmsimg.com/assets/GNLZZGG0022S299.png?lock=720x540",
     "category": "movies",
     "streams": [
       "http://107.167.16.138/zeetalkies/index.m3u8?token=test"
@@ -1584,7 +1584,7 @@
     "language_code": "mar",
     "language_name": "Marathi",
     "network": "9X Media",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/9X_Jhakaas.png",
+    "logo": "https://dtil.tmsimg.com/assets/s90012_ld_h15_aa.png?lock=720x540",
     "category": "entertainment",
     "streams": [
       "https://amg01281-9xmediapvtltd-9xjhakaas-samsungin-ci2cs.amagi.tv/playlist/amg01281-9xmediapvtltd-9xjhakaas-samsungin/playlist.m3u8",
@@ -1598,7 +1598,7 @@
     "language_code": "mar",
     "language_name": "Marathi",
     "network": "Disney Star",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Star_Pravah.png",
+    "logo": "https://img10.hotstar.com/image/upload/f_auto/sources/r1/cms/prod/5780/1782291675780-h.jpg",
     "category": "entertainment",
     "streams": [
       "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:starpravah.smil/chunklist_b1928000.m3u8"
@@ -1610,7 +1610,7 @@
     "language_code": "mar",
     "language_name": "Marathi",
     "network": "Viacom18",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Colors_Marathi.png",
+    "logo": "https://img10.hotstar.com/image/upload/f_auto/sources/r1/cms/prod/5106/1782291335106-h.jpg",
     "category": "entertainment",
     "streams": [
       "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:colorsmarathihd.smil/playlist.m3u8"
@@ -1622,7 +1622,7 @@
     "language_code": "mar",
     "language_name": "Marathi",
     "network": "",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Fakt_Marathi.png",
+    "logo": "https://dtil.tmsimg.com/assets/s143038_ld_h15_aa.png?lock=720x540",
     "category": "entertainment",
     "streams": [
       "https://mumt07.tangotv.in/zHjX9OFlFAKTMARATHI/index.m3u8"
@@ -1634,7 +1634,7 @@
     "language_code": "mar",
     "language_name": "Marathi",
     "network": "Culver Max",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Sony_Marathi.png",
+    "logo": "https://dtil.tmsimg.com/assets/s157970_ld_h15_aa.png?lock=720x540",
     "category": "entertainment",
     "streams": [
       "http://107.167.16.138/sonymarathi/index.m3u8?token=test"
@@ -1646,7 +1646,7 @@
     "language_code": "mar",
     "language_name": "Marathi",
     "network": "Zee",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Zee_Marathi.png",
+    "logo": "https://dtil.tmsimg.com/assets/GNLZZGG00233VCK.png?lock=720x540",
     "category": "entertainment",
     "streams": [
       "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/YuppTV/ZeeMarathiHD.m3u8"
@@ -1658,7 +1658,7 @@
     "language_code": "mar",
     "language_name": "Marathi",
     "network": "Media Worldwide",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Sangeet_Marathi.png",
+    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/Sangeet_Marathi.png",
     "category": "music",
     "streams": [
       "https://mumt07.tangotv.in/zHjX9OFlSANGEETMARATHI/index.m3u8",
@@ -1671,7 +1671,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Enterr10",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Dangal.png",
+    "logo": "https://dtil.tmsimg.com/assets/s142771_ld_h9_aa.png?lock=720x540",
     "category": "entertainment",
     "streams": [
       "https://live-dangal.akamaized.net/liveabr/playlist.m3u8"
@@ -1683,7 +1683,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Enterr10",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Dangal_2.png",
+    "logo": "https://i.imgur.com/BEr1r7L.png",
     "category": "entertainment",
     "streams": [
       "https://live-dangal2.akamaized.net/liveabr/playlist.m3u8"
@@ -1695,7 +1695,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Shemaroo",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Shemaroo_TV.png",
+    "logo": "https://i.imgur.com/UNNcOef.png",
     "category": "entertainment",
     "streams": [
       "https://mumt06.tangotv.in/qYyB8fXVSHEMAROOTV/index.m3u8",
@@ -1709,7 +1709,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Shemaroo",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Shemaroo_Umang.png",
+    "logo": "https://dtil.tmsimg.com/assets/s143779_ld_h15_aa.png?lock=720x540",
     "category": "entertainment",
     "streams": [
       "https://mumt04.tangotv.in/m18aqlK4SHEMAROOUMANG/index.m3u8",
@@ -1722,7 +1722,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Culver Max",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Sony_Pal.png",
+    "logo": "https://dtil.tmsimg.com/assets/s157973_ld_h15_aa.png?lock=720x540",
     "category": "entertainment",
     "streams": [
       "http://59.103.38.46:8000/play/a0ac/index.m3u8"
@@ -1734,7 +1734,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Culver Max",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Sony_SAB.png",
+    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/70954ffc9bae055e09e48393b47570ea.png",
     "category": "entertainment",
     "streams": [
       "https://drk6xq0vhn.gpcdn.net/live/sub_hd_abr/index.m3u8",
@@ -1747,7 +1747,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Disney Star",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Star_Plus.png",
+    "logo": "https://img10.hotstar.com/image/upload/f_auto/sources/r1/cms/prod/2384/1782291852384-h.jpg",
     "category": "entertainment",
     "streams": [
       "http://66.102.126.10:8000/play/a008/index.m3u8",
@@ -1760,7 +1760,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Goldmines",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Goldmines.png",
+    "logo": "https://dtil.tmsimg.com/assets/s143087_ld_h15_aa.png?lock=720x540",
     "category": "movies",
     "streams": [
       "https://mumt04.tangotv.in/m18aqlK4GOLDMINES/index.m3u8",
@@ -1774,7 +1774,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "B4U",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/B4U_Movies.png",
+    "logo": "https://dtil.tmsimg.com/assets/s140063_ld_h9_aa.png?lock=720x540",
     "category": "movies",
     "streams": [
       "https://mumt06.tangotv.in/qYyB8fXVB4UMOVIES/index.m3u8",
@@ -1788,7 +1788,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "B4U",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/B4U_Kadak.png",
+    "logo": "https://dtil.tmsimg.com/assets/s142695_ld_h15_aa.png?lock=720x540",
     "category": "movies",
     "streams": [
       "https://mumt06.tangotv.in/qYyB8fXVB4UKADAK/index.m3u8",
@@ -1802,7 +1802,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Zee",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Zee_Action.png",
+    "logo": "https://dtil.tmsimg.com/assets/GNLZZGG0022K5ZV.png?lock=720x540",
     "category": "movies",
     "streams": [
       "http://107.167.16.138/zeeaction/index.m3u8?token=test"
@@ -1814,7 +1814,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Zee",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Zee_Classic.png",
+    "logo": "https://dtil.tmsimg.com/assets/GNLZZGG0022J66T.png?lock=720x540",
     "category": "movies",
     "streams": [
       "http://107.167.16.138/zeeclassic/index.m3u8?token=test"
@@ -1826,7 +1826,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Culver Max",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Sony_Max_2.png",
+    "logo": "https://dtil.tmsimg.com/assets/s143801_ld_h15_aa.png?lock=720x540",
     "category": "movies",
     "streams": [
       "http://107.167.16.138/sonymax2/index.m3u8?token=test"
@@ -1838,7 +1838,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "9X Media",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/9XM.png",
+    "logo": "https://dtil.tmsimg.com/assets/s77447_ld_h15_aa.png?lock=720x540",
     "category": "music",
     "streams": [
       "https://9xjio.wiseplayout.com/9XM/master.m3u8",
@@ -1852,7 +1852,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "9X Media",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/9X_Jalwa.png",
+    "logo": "https://i.imgur.com/qubgOi5.png",
     "category": "music",
     "streams": [
       "https://wiselp.wiseplayout.com/9X_Jalwa/master.m3u8",
@@ -1865,7 +1865,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "B4U",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/B4U_Music.png",
+    "logo": "https://dtil.tmsimg.com/assets/s158141_ld_h15_aa.png?lock=720x540",
     "category": "music",
     "streams": [
       "https://amg01408-amg01408c5-amgplt0747.playout.now3.amagi.tv/b4um001/playlist.m3u8",
@@ -1879,7 +1879,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Zee",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Zing.png",
+    "logo": "https://dtil.tmsimg.com/assets/GNLZZGG0025L26R.png?lock=720x540",
     "category": "music",
     "streams": [
       "http://107.167.16.138/zing/index.m3u8?token=test"
@@ -1891,7 +1891,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Times Group",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Zoom.png",
+    "logo": "https://i.imgur.com/mxx05Z9.png",
     "category": "music",
     "streams": [
       "https://mumbai-edge.smartplaytv.in/Zoom/index.m3u8",
@@ -1904,7 +1904,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "YRF",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/YRF_Music.png",
+    "logo": "https://i.imgur.com/mxx05Z9.png",
     "category": "music",
     "streams": [
       "https://vidaa.kableone.com/hls/live/2111218/YrfMusic/1.m3u8"
@@ -1916,7 +1916,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Cosmos-Maya",
-    "logo": "https://i.imgur.com/8QzP8uD.png",
+    "logo": "https://d229kpbsb5jevy.cloudfront.net/yupptvnew/content/common/channel/logos/mjvezt.png",
     "category": "kids",
     "streams": [
       "https://yuppparoriglin.akamaized.net/181224/smil:wowkidzhindi.smil/playlist.m3u8?hdnts=st=1735898689~exp=1835898688~acl=*~hmac=f5fe24724fe05481e3841f9eb5ab8efdee0a3dd83645ae9dcf45703f525bab7b"
@@ -1928,7 +1928,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Warner Bros. Discovery",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Cartoon_Network.png",
+    "logo": "https://dtil.tmsimg.com/assets/s157576_ld_h15_aa.png?lock=720x540",
     "category": "kids",
     "streams": [
       "https://drk6xq0vhn.gpcdn.net/live/cn_sd_abr/index.m3u8",
@@ -1941,7 +1941,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Warner Bros. Discovery",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Discovery_Kids.png",
+    "logo": "https://dtil.tmsimg.com/assets/s159011_ld_h15_aa.png?lock=720x540",
     "category": "kids",
     "streams": [
       "https://drk6xq0vhn.gpcdn.net/live/discovery_kids_abr/index.m3u8"
@@ -1953,7 +1953,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Viacom18",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Sonic_Nickelodeon.png",
+    "logo": "https://img10.hotstar.com/image/upload/f_auto/sources/r1/cms/prod/6294/1782290926294-h.jpg",
     "category": "kids",
     "streams": [
       "http://103.185.24.134:3001/SONIC/index.m3u8",
@@ -1966,7 +1966,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Disney Star",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Hungama.png",
+    "logo": "https://dtil.tmsimg.com/assets/s143150_ld_h15_aa.png?lock=720x540",
     "category": "kids",
     "streams": [
       "http://103.185.24.134:3001/HUNGAMA/index.m3u8",
@@ -1979,7 +1979,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Disney Star",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Super_Hungama.png",
+    "logo": "https://plain-apac-prod-public.komododecks.com/202609/07/lNjbGo0Rcgz3vhfoyTN7/image.png",
     "category": "kids",
     "streams": [
       "http://103.185.24.134:3001/SUPER-HUNGAMA/index.m3u8"
@@ -1991,7 +1991,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Culver Max",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Sony_Yay.png",
+    "logo": "https://dtil.tmsimg.com/assets/s159100_ld_h15_aa.png?lock=720x540",
     "category": "kids",
     "streams": [
       "http://103.165.93.31:8095/sonyYay/index.m3u8"
@@ -2003,7 +2003,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Disney Star",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Disney_Channel.png",
+    "logo": "https://img10.hotstar.com/image/upload/f_auto/sources/r1/cms/prod/1540/1785251571540-h.jpg",
     "category": "kids",
     "streams": [
       "http://66.102.126.10:8000/play/a013/index.m3u8"
@@ -2015,7 +2015,7 @@
     "language_code": "eng",
     "language_name": "English",
     "network": "DQ Entertainment",
-    "logo": "https://i.imgur.com/nAv3icS.png",
+    "logo": "https://pash.ink/storage/uploads/JungleBook_Logo.png",
     "category": "kids",
     "streams": [
       "https://cc-4bhi5osabejc9.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-4bhi5osabejc9/junglebook.m3u8"
@@ -2027,7 +2027,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "IN10 Media",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Epic.png",
+    "logo": "https://dtil.tmsimg.com/assets/GNLZZGG0032BVSR.png?lock=720x540",
     "category": "kids",
     "streams": [
       "https://cc-t8lqe1o99pszu.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-t8lqe1o99pszu/playlist.m3u8"
@@ -2039,7 +2039,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "",
-    "logo": "https://i.imgur.com/8QzP8uD.png",
+    "logo": "https://i.imgur.com/BbFNpMr.jpeg",
     "category": "kids",
     "streams": [
       "https://server.zillarbarta.com/zbcatun/video.m3u8"
@@ -2051,7 +2051,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Sanjeev Kapoor",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Food_Food.png",
+    "logo": "https://i.imgur.com/J930pA1.png",
     "category": "infotainment",
     "streams": [
       "https://mumt03.tangotv.in/Dsly5z3HFOODFOOD/index.m3u8",
@@ -2065,7 +2065,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Warner Bros. Discovery",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Discovery_Channel.png",
+    "logo": "https://dtil.tmsimg.com/assets/s159106_ld_h15_aa.png?lock=720x540",
     "category": "infotainment",
     "streams": [
       "https://drk6xq0vhn.gpcdn.net/live/discovery_sd_abr/index.m3u8",
@@ -2078,7 +2078,7 @@
     "language_code": "eng",
     "language_name": "English",
     "network": "Warner Bros. Discovery",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Discovery_Science.png",
+    "logo": "https://dtil.tmsimg.com/assets/s159107_ld_h15_aa.png?lock=720x540",
     "category": "infotainment",
     "streams": [
       "https://drk6xq0vhn.gpcdn.net/live/discovery_science_abr/index.m3u8"
@@ -2090,7 +2090,7 @@
     "language_code": "eng",
     "language_name": "English",
     "network": "Warner Bros. Discovery",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Discovery_Turbo.png",
+    "logo": "https://dtil.tmsimg.com/assets/s159108_ld_h15_aa.png?lock=720x540",
     "category": "infotainment",
     "streams": [
       "https://drk6xq0vhn.gpcdn.net/live/discovery_turbo_abr/index.m3u8"
@@ -2102,7 +2102,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Warner Bros. Discovery",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Investigation_Discovery.png",
+    "logo": "https://dtil.tmsimg.com/assets/s157811_ld_h15_aa.png?lock=720x540",
     "category": "infotainment",
     "streams": [
       "https://drk6xq0vhn.gpcdn.net/live/id_hd_abr/index.m3u8"
@@ -2114,7 +2114,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Culver Max / BBC",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Sony_BBC_Earth.png",
+    "logo": "https://dtil.tmsimg.com/assets/s143800_ld_h15_aa.png?lock=720x540",
     "category": "infotainment",
     "streams": [
       "http://103.185.24.134:3001/SONY-BBC/index.m3u8"
@@ -2126,7 +2126,7 @@
     "language_code": "eng",
     "language_name": "English",
     "network": "Warner Bros. Discovery",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/TLC.png",
+    "logo": "https://dtil.tmsimg.com/assets/s123500_ld_h15_aa.png?lock=720x540",
     "category": "infotainment",
     "streams": [
       "https://drk6xq0vhn.gpcdn.net/live/tlc_hd_abr/index.m3u8",
@@ -2139,7 +2139,7 @@
     "language_code": "eng",
     "language_name": "English",
     "network": "Media Worldwide",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Travel_XP.png",
+    "logo": "https://i.imgur.com/HUWEnc5.png",
     "category": "infotainment",
     "streams": [
       "https://amg00416-amg00416c9-samsung-in-4882.playouts.now.amagi.tv/playlist/amg00416-travelxp-travelxphd-samsungin/playlist.m3u8",
@@ -2153,7 +2153,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "A+E Networks / TV18",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/History_TV_18.png",
+    "logo": "https://dtil.tmsimg.com/assets/s143133_ld_h15_aa.png?lock=720x540",
     "category": "infotainment",
     "streams": [
       "https://techtraveleat.in/stream.m3u8?id=historytv18eng",
@@ -2166,7 +2166,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Parliament of India",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Sansad_TV_SD.png",
+    "logo": "https://dtil.tmsimg.com/assets/s143760_ld_h15_aa.png?lock=720x540",
     "category": "infotainment",
     "streams": [
       "https://d2lk5u59tns74c.cloudfront.net/out/v1/fff8f20221d5456e8922e689d71dedc3/index.m3u8",
@@ -2180,7 +2180,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Parliament of India",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/Sansad_TV_SD.png",
+    "logo": "https://dtil.tmsimg.com/assets/s143761_ld_h15_aa.png?lock=720x540",
     "category": "infotainment",
     "streams": [
       "https://d2lk5u59tns74c.cloudfront.net/out/v1/e4182054dce340da9e0ff38b6b3658a4/index.m3u8",
@@ -2194,7 +2194,7 @@
     "language_code": "hin",
     "language_name": "Hindi",
     "network": "Doordarshan",
-    "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/DD_Kisan.png",
+    "logo": "https://dtil.tmsimg.com/assets/s142789_ld_h9_aa.png?lock=720x540",
     "category": "infotainment",
     "streams": [
       "https://mumbai-edge.smartplaytv.in/DDKisan/index.m3u8",
