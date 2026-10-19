@@ -22,6 +22,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   final FocusNode _searchBarContainerFocusNode = FocusNode();
+  final FocusNode _firstCardFocusNode = FocusNode(debugLabel: 'FirstCardFocusNode');
   bool _isSearchEditing = false;
   bool _isSearchContainerFocused = false;
   DateTime? _lastBackPressTime;
@@ -58,6 +59,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
     _searchController.dispose();
     _searchFocusNode.dispose();
     _searchBarContainerFocusNode.dispose();
+    _firstCardFocusNode.dispose();
     widget.channelService.removeListener(_onServiceUpdate);
     super.dispose();
   }
@@ -186,6 +188,9 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
               onGenreSelected: (genreCode) {
                 service.selectCategory(genreCode);
               },
+              onNavigateToContent: () {
+                _firstCardFocusNode.requestFocus();
+              },
             ),
 
             // Main TV Screen Area
@@ -199,102 +204,112 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                     color: TVTheme.background,
                     child: Row(
                       children: [
-                        // Active category title & badge
-                        Row(
-                          children: [
-                            Text(
-                              activeCat.icon,
-                              style: const TextStyle(fontSize: 22),
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              activeCat.code == 'fav'
-                                  ? 'Favorites & Recents'
-                                  : activeCat.code == 'all'
-                                      ? 'All Channels'
-                                      : service.selectedCategory == 'all'
-                                          ? '${activeCat.name} Channels'
-                                          : '${activeCat.name} ${service.selectedCategory == 'news' ? 'News' : service.selectedCategory == 'movies' ? 'Movies' : service.selectedCategory == 'music' ? 'Music' : 'Entertainment'}',
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: TVTheme.textPrimary,
+                        // Active category title & badge (Protected against overflow)
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Text(
+                                activeCat.icon,
+                                style: const TextStyle(fontSize: 22),
                               ),
-                            ),
-                            const SizedBox(width: 12),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: TVTheme.focusColor.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: TVTheme.focusColor.withOpacity(0.5)),
-                              ),
-                              child: Text(
-                                activeCat.code == 'fav'
-                                    ? '${service.favoriteChannels.length} Fav • ${recents.length} Recent'
-                                    : '${channels.length} Channels',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: TVTheme.focusColor,
+                              const SizedBox(width: 10),
+                              Flexible(
+                                child: Text(
+                                  activeCat.code == 'fav'
+                                      ? 'Favorites & Recents'
+                                      : activeCat.code == 'all'
+                                          ? 'All Channels'
+                                          : service.selectedCategory == 'all'
+                                              ? '${activeCat.name} Channels'
+                                              : '${activeCat.name} ${service.selectedCategory == 'news' ? 'News' : service.selectedCategory == 'movies' ? 'Movies' : service.selectedCategory == 'music' ? 'Music' : 'Entertainment'}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: TVTheme.textPrimary,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 12),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: TVTheme.focusColor.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: TVTheme.focusColor.withOpacity(0.5)),
+                                ),
+                                child: Text(
+                                  activeCat.code == 'fav'
+                                      ? '${service.favoriteChannels.length} Fav • ${recents.length} Recent'
+                                      : '${channels.length} Channels',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: TVTheme.focusColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        const Spacer(),
+                        const SizedBox(width: 16),
 
-                        // Search Bar with Remote-Aware Focus & Escaping (TV Focus Button Pattern)
-                        Focus(
-                          focusNode: _searchBarContainerFocusNode,
-                          onFocusChange: (focused) {
-                            setState(() {
-                              _isSearchContainerFocused = focused;
-                            });
-                          },
-                          onKeyEvent: (node, event) {
-                            if (event is! KeyDownEvent) return KeyEventResult.ignored;
-                            final key = event.logicalKey;
+                        // Fixed Right Controls: Search Bar + Clock
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Search Bar with Remote-Aware Focus & Escaping (TV Focus Button Pattern)
+                            Focus(
+                              focusNode: _searchBarContainerFocusNode,
+                              onFocusChange: (focused) {
+                                setState(() {
+                                  _isSearchContainerFocused = focused;
+                                });
+                              },
+                              onKeyEvent: (node, event) {
+                                if (event is! KeyDownEvent) return KeyEventResult.ignored;
+                                final key = event.logicalKey;
 
-                            if (_isSearchEditing) {
-                              if (key == LogicalKeyboardKey.escape ||
-                                  key == LogicalKeyboardKey.goBack ||
-                                  key.keyId == 0x00100000004) {
-                                _exitSearchEditing();
-                                return KeyEventResult.handled;
-                              }
-                              if (key == LogicalKeyboardKey.arrowDown) {
-                                _exitSearchEditing();
-                                FocusScope.of(context).nextFocus();
-                                return KeyEventResult.handled;
-                              }
-                              return KeyEventResult.ignored;
-                            }
+                                if (_isSearchEditing) {
+                                  if (key == LogicalKeyboardKey.escape ||
+                                      key == LogicalKeyboardKey.goBack ||
+                                      key.keyId == 0x00100000004) {
+                                    _exitSearchEditing();
+                                    return KeyEventResult.handled;
+                                  }
+                                  if (key == LogicalKeyboardKey.arrowDown) {
+                                    _exitSearchEditing();
+                                    _firstCardFocusNode.requestFocus();
+                                    return KeyEventResult.handled;
+                                  }
+                                  return KeyEventResult.ignored;
+                                }
 
-                            // Navigation Mode (not editing)
-                            if (key == LogicalKeyboardKey.select ||
-                                key == LogicalKeyboardKey.enter ||
-                                key == LogicalKeyboardKey.numpadEnter ||
-                                key == LogicalKeyboardKey.space ||
-                                key == LogicalKeyboardKey.gameButtonA ||
-                                key.keyId == 0x00100000017 ||
-                                key.keyId == 0x00100000042) {
-                              _enterSearchEditing();
-                              return KeyEventResult.handled;
-                            }
+                                // Navigation Mode (not editing)
+                                if (key == LogicalKeyboardKey.select ||
+                                    key == LogicalKeyboardKey.enter ||
+                                    key == LogicalKeyboardKey.numpadEnter ||
+                                    key == LogicalKeyboardKey.space ||
+                                    key == LogicalKeyboardKey.gameButtonA ||
+                                    key.keyId == 0x00100000017 ||
+                                    key.keyId == 0x00100000042) {
+                                  _enterSearchEditing();
+                                  return KeyEventResult.handled;
+                                }
 
-                            if (key == LogicalKeyboardKey.arrowDown) {
-                              FocusScope.of(context).nextFocus();
-                              return KeyEventResult.handled;
-                            }
+                                if (key == LogicalKeyboardKey.arrowDown) {
+                                  _firstCardFocusNode.requestFocus();
+                                  return KeyEventResult.handled;
+                                }
 
-                            if (key == LogicalKeyboardKey.arrowLeft) {
-                              FocusScope.of(context).previousFocus();
-                              return KeyEventResult.handled;
-                            }
+                                if (key == LogicalKeyboardKey.arrowLeft) {
+                                  FocusScope.of(context).previousFocus();
+                                  return KeyEventResult.handled;
+                                }
 
-                            return KeyEventResult.ignored;
-                          },
+                                return KeyEventResult.ignored;
+                              },
                           child: GestureDetector(
                             onTap: _enterSearchEditing,
                             child: AnimatedContainer(
@@ -421,11 +436,14 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                         ),
                       ],
                     ),
-                  ),
+                  ],
+                ),
+              ),
 
-                  // Unified Smooth-Scrolling Content Area
-                  Expanded(
-                    child: CustomScrollView(
+              // Unified Smooth-Scrolling Content Area
+              Expanded(
+                child: FocusTraversalGroup(
+                  child: CustomScrollView(
                       slivers: [
                         if (service.selectedLanguage == 'fav' && service.searchQuery.isEmpty) ...[
                           // SECTION 1: Favorite Channels Header
@@ -508,6 +526,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                     return TVChannelCard(
                                       channel: channel,
                                       autoFocus: index == 0,
+                                      focusNode: index == 0 ? _firstCardFocusNode : null,
                                       onSelect: () => _openPlayer(channel, service.favoriteChannels),
                                       onToggleFavorite: () => service.toggleFavorite(channel),
                                     );
@@ -596,6 +615,9 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                     final channel = recents[index];
                                     return TVChannelCard(
                                       channel: channel,
+                                      focusNode: (service.favoriteChannels.isEmpty && index == 0)
+                                          ? _firstCardFocusNode
+                                          : null,
                                       onSelect: () => _openPlayer(channel, recents),
                                       onToggleFavorite: () => service.toggleFavorite(channel),
                                     );
@@ -644,6 +666,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                     return TVChannelCard(
                                       channel: channel,
                                       autoFocus: index == 0,
+                                      focusNode: index == 0 ? _firstCardFocusNode : null,
                                       onSelect: () => _openPlayer(channel, channels),
                                       onToggleFavorite: () => service.toggleFavorite(channel),
                                     );
@@ -656,7 +679,8 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                       ],
                     ),
                   ),
-                ],
+                ),
+              ],
               ),
             ),
           ],

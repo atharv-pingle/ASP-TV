@@ -2200,5 +2200,202 @@
       "https://mumbai-edge.smartplaytv.in/DDKisan/index.m3u8",
       "https://cdn.pishow.tv/ott/live/223/master.m3u8"
     ]
+  },
+  {
+    "id": "comedy_central_hd",
+    "name": "Comedy Central HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "entertainment",
+    "network": "Viacom18",
+    "logo": "https://dtil.tmsimg.com/assets/s142749_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "https://barinaslive1.boldmss.com/COMEDY/COMEDY.isml/COMEDY.m3u8"
+    ]
+  },
+  {
+    "id": "colors_infinity_hd",
+    "name": "Colors Infinity HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "entertainment",
+    "network": "Viacom18",
+    "logo": "https://dtil.tmsimg.com/assets/s151978_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "http://103.151.60.162:2122/play/a02r/index.m3u8?hls"
+    ]
+  },
+  {
+    "id": "star_world_hd",
+    "name": "Star World HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "entertainment",
+    "network": "Disney Star",
+    "logo": "https://dtil.tmsimg.com/assets/s143922_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "http://103.185.24.134:3001/Star-World/index.m3u8"
+    ]
+  },
+  {
+    "id": "zee_cafe_hd",
+    "name": "Zee Cafe HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "entertainment",
+    "network": "Zee Entertainment",
+    "logo": "https://dtil.tmsimg.com/assets/s144140_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "https://amg01117-amg01117c1-amgplt0029.playout.now3.amagi.tv/playlist/amg01117-amg01117c1-amgplt0029/playlist.m3u8"
+    ]
+  },
+  {
+    "id": "axn_hd",
+    "name": "AXN HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "entertainment",
+    "network": "Sony Pictures",
+    "logo": "https://dtil.tmsimg.com/assets/s142566_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "http://15.204.246.24:8080/AXNHD/index.m3u8",
+      "http://181.119.66.28:8081/AXN/index.m3u8"
+    ]
+  },
+  {
+    "id": "star_movies_hd",
+    "name": "Star Movies HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "movies",
+    "network": "Disney Star",
+    "logo": "https://dtil.tmsimg.com/assets/s143916_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "http://103.185.24.134:3001/Star-Movies/index.m3u8",
+      "http://103.151.60.162:2122/play/a02k/index.m3u8?hls"
+    ]
+  },
+  {
+    "id": "sony_pix_hd",
+    "name": "Sony Pix HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "movies",
+    "network": "Sony Pictures",
+    "logo": "https://dtil.tmsimg.com/assets/s143878_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "http://103.151.60.162:2122/play/a01d/index.m3u8?hls"
+    ]
+  },
+  {
+    "id": "movies_now_hd",
+    "name": "Movies Now HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "movies",
+    "network": "Times Network",
+    "logo": "https://dtil.tmsimg.com/assets/s143575_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "http://103.151.60.162:2122/play/a02w/index.m3u8?hls"
+    ]
+  },
+  {
+    "id": "romedy_now_hd",
+    "name": "Romedy Now HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "movies",
+    "network": "Times Network",
+    "logo": "https://dtil.tmsimg.com/assets/s143764_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "https://drk6xq0vhn.gpcdn.net/live/tlc_hd_abr/index.m3u8"
+    ]
+  },
+  {
+    "id": "mnx_hd",
+    "name": "MNX HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "movies",
+    "network": "Times Network",
+    "logo": "https://dtil.tmsimg.com/assets/s158327_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "http://tvsen7.aynascope.net/hbo2/index.m3u8"
+    ]
+  },
+  {
+    "id": "hbo_hits",
+    "name": "HBO Hits",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "movies",
+    "network": "Warner Bros. Discovery",
+    "logo": "https://dtil.tmsimg.com/assets/s143105_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "http://tvsen7.aynascope.net/hbo2/index.m3u8",
+      "http://tvsen7.aynascope.net/hbo/index.m3u8"
+    ]
+  },
+  {
+    "id": "vh1_hd",
+    "name": "Vh1 HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "music",
+    "network": "Viacom18",
+    "logo": "https://dtil.tmsimg.com/assets/s144070_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "https://amg01281-9xmediapvtltd-9xjhakaas-samsungin-ci2cs.amagi.tv/playlist/amg01281-9xmediapvtltd-9xjhakaas-samsungin/playlist.m3u8",
+      "http://23.237.104.106:8080/USA_MTV_LIVE/index.m3u8"
+    ]
+  },
+  {
+    "id": "9xo_music",
+    "name": "9XO",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "music",
+    "network": "9X Media",
+    "logo": "https://dtil.tmsimg.com/assets/s142461_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "https://9xjio.wiseplayout.com/9XM/master.m3u8",
+      "https://epiconvh.akamaized.net/live/9XM/master.m3u8"
+    ]
+  },
+  {
+    "id": "clubbing_tv",
+    "name": "Clubbing TV",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "music",
+    "network": "Mediawan",
+    "logo": "https://dtil.tmsimg.com/assets/s158229_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "https://d1j2csarxnwazk.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-uze1m6xh4fiyr-ssai-prd/master.m3u8"
+    ]
+  },
+  {
+    "id": "trace_urban",
+    "name": "Trace Urban",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "music",
+    "network": "Trace Group",
+    "logo": "https://dtil.tmsimg.com/assets/s144023_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "https://d3gnyty2vddhsg.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/pb-ytipwjqub3kf8/TMC2_IN.m3u8?ads.ads_cdn=cf&ads.cdn=cf"
+    ]
+  },
+  {
+    "id": "mtv_live_hd",
+    "name": "MTV Live HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "category": "music",
+    "network": "Paramount",
+    "logo": "https://dtil.tmsimg.com/assets/s143564_ld_h15_aa.png?lock=720x540",
+    "streams": [
+      "http://23.237.104.106:8080/USA_MTV_LIVE/index.m3u8"
+    ]
   }
 ]

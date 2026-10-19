@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'services/channel_service.dart';
+import 'services/epg_service.dart';
 import 'screens/tv_home_screen.dart';
 import 'theme/tv_theme.dart';
 
@@ -18,6 +19,7 @@ void main() async {
 
   final channelService = ChannelService();
   await channelService.initialize();
+  await EpgService.instance.initialize();
 
   runApp(ASPTVApp(channelService: channelService));
 }

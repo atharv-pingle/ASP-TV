@@ -3,12 +3,13 @@ import 'package:flutter/services.dart';
 import '../models/language.dart';
 import '../theme/tv_theme.dart';
 
-class TVSidebar extends StatelessWidget {
+class TVSidebar extends StatefulWidget {
   final List<LanguageCategory> categories;
   final String selectedCategory;
   final String selectedGenre;
   final ValueChanged<String> onCategorySelected;
   final ValueChanged<String> onGenreSelected;
+  final VoidCallback? onNavigateToContent;
 
   const TVSidebar({
     Key? key,
@@ -17,7 +18,27 @@ class TVSidebar extends StatelessWidget {
     this.selectedGenre = 'all',
     required this.onCategorySelected,
     required this.onGenreSelected,
+    this.onNavigateToContent,
   }) : super(key: key);
+
+  @override
+  State<TVSidebar> createState() => _TVSidebarState();
+}
+
+class _TVSidebarState extends State<TVSidebar> {
+  final Map<String, FocusNode> _nodes = {};
+
+  FocusNode _getNode(String key) {
+    return _nodes.putIfAbsent(key, () => FocusNode(debugLabel: key));
+  }
+
+  @override
+  void dispose() {
+    for (final node in _nodes.values) {
+      node.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,35 +109,17 @@ class TVSidebar extends StatelessWidget {
 
           // Categories & Language List with Expandable Genres
           Expanded(
-            child: ListView.builder(
+            child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final cat = categories[index];
-                final isLangSelected = cat.code == selectedCategory;
-                final isAllGenre = selectedGenre == 'all';
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _TVSidebarItem(
-                      category: cat,
-                      isSelected: isLangSelected && isAllGenre,
-                      isExpanded: isLangSelected && cat.genres.isNotEmpty,
-                      onSelect: () => onCategorySelected(cat.code),
-                    ),
-                    if (isLangSelected && cat.genres.isNotEmpty) ...[
-                      for (final genre in cat.genres)
-                        _TVGenreItem(
-                          genre: genre,
-                          isSelected: selectedGenre == genre.code,
-                          onSelect: () => onGenreSelected(genre.code),
-                        ),
-                    ],
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (int i = 0; i < widget.categories.length; i++) ...[
+                    _buildCategoryBlock(i),
                   ],
-                );
-              },
+                ],
+              ),
             ),
           ),
 
@@ -145,20 +148,108 @@ class TVSidebar extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildCategoryBlock(int catIndex) {
+    final cat = widget.categories[catIndex];
+    final isLangSelected = cat.code == widget.selectedCategory;
+    final isAllGenre = widget.selectedGenre == 'all';
+    final hasGenres = cat.genres.isNotEmpty;
+    final isExpanded = isLangSelected && hasGenres;
+
+    final catNode = _getNode('cat_${cat.code}');
+
+    // Target for down from category: first genre if expanded, or next category
+    VoidCallback? onDown;
+    if (isExpanded) {
+      onDown = () {
+        final firstGenreNode = _getNode('genre_${cat.code}_${cat.genres.first.code}');
+        firstGenreNode.requestFocus();
+      };
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _TVSidebarItem(
+          focusNode: catNode,
+          category: cat,
+          isSelected: isLangSelected && isAllGenre,
+          isExpanded: isExpanded,
+          onSelect: () => widget.onCategorySelected(cat.code),
+          onDownToSubcategory: onDown,
+          onRightToContent: widget.onNavigateToContent,
+        ),
+        if (isExpanded) ...[
+          for (int g = 0; g < cat.genres.length; g++)
+            _buildGenreItem(cat, catIndex, g),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildGenreItem(LanguageCategory cat, int catIndex, int genreIndex) {
+    final genre = cat.genres[genreIndex];
+    final isSelected = widget.selectedGenre == genre.code;
+    final genreNode = _getNode('genre_${cat.code}_${genre.code}');
+
+    // If first genre, arrowUp goes to parent category
+    VoidCallback? onUp;
+    if (genreIndex == 0) {
+      onUp = () {
+        _getNode('cat_${cat.code}').requestFocus();
+      };
+    } else {
+      onUp = () {
+        _getNode('genre_${cat.code}_${cat.genres[genreIndex - 1].code}').requestFocus();
+      };
+    }
+
+    // If last genre, arrowDown goes to next category
+    VoidCallback? onDown;
+    if (genreIndex == cat.genres.length - 1) {
+      if (catIndex + 1 < widget.categories.length) {
+        onDown = () {
+          final nextCat = widget.categories[catIndex + 1];
+          _getNode('cat_${nextCat.code}').requestFocus();
+        };
+      }
+    } else {
+      onDown = () {
+        _getNode('genre_${cat.code}_${cat.genres[genreIndex + 1].code}').requestFocus();
+      };
+    }
+
+    return _TVGenreItem(
+      focusNode: genreNode,
+      genre: genre,
+      isSelected: isSelected,
+      onSelect: () => widget.onGenreSelected(genre.code),
+      onUp: onUp,
+      onDown: onDown,
+      onRightToContent: widget.onNavigateToContent,
+    );
+  }
 }
 
 class _TVSidebarItem extends StatefulWidget {
+  final FocusNode focusNode;
   final LanguageCategory category;
   final bool isSelected;
   final bool isExpanded;
   final VoidCallback onSelect;
+  final VoidCallback? onDownToSubcategory;
+  final VoidCallback? onRightToContent;
 
   const _TVSidebarItem({
     Key? key,
+    required this.focusNode,
     required this.category,
     required this.isSelected,
     this.isExpanded = false,
     required this.onSelect,
+    this.onDownToSubcategory,
+    this.onRightToContent,
   }) : super(key: key);
 
   @override
@@ -173,6 +264,7 @@ class _TVSidebarItemState extends State<_TVSidebarItem> {
     final active = widget.isSelected;
 
     return Focus(
+      focusNode: widget.focusNode,
       onFocusChange: (focused) {
         setState(() {
           _isFocused = focused;
@@ -181,6 +273,20 @@ class _TVSidebarItemState extends State<_TVSidebarItem> {
       onKeyEvent: (node, event) {
         if (event is KeyDownEvent) {
           final key = event.logicalKey;
+
+          if (key == LogicalKeyboardKey.arrowDown &&
+              widget.isExpanded &&
+              widget.onDownToSubcategory != null) {
+            widget.onDownToSubcategory!();
+            return KeyEventResult.handled;
+          }
+
+          if (key == LogicalKeyboardKey.arrowRight &&
+              widget.onRightToContent != null) {
+            widget.onRightToContent!();
+            return KeyEventResult.handled;
+          }
+
           if (key == LogicalKeyboardKey.select ||
               key == LogicalKeyboardKey.enter ||
               key == LogicalKeyboardKey.numpadEnter ||
@@ -250,7 +356,9 @@ class _TVSidebarItemState extends State<_TVSidebarItem> {
               ),
               if (widget.category.genres.isNotEmpty)
                 Icon(
-                  widget.isExpanded ? Icons.keyboard_arrow_down_rounded : Icons.keyboard_arrow_right_rounded,
+                  widget.isExpanded
+                      ? Icons.keyboard_arrow_down_rounded
+                      : Icons.keyboard_arrow_right_rounded,
                   size: 16,
                   color: _isFocused ? Colors.black87 : TVTheme.textMuted,
                 ),
@@ -281,15 +389,23 @@ class _TVSidebarItemState extends State<_TVSidebarItem> {
 }
 
 class _TVGenreItem extends StatefulWidget {
+  final FocusNode focusNode;
   final GenreCategory genre;
   final bool isSelected;
   final VoidCallback onSelect;
+  final VoidCallback? onUp;
+  final VoidCallback? onDown;
+  final VoidCallback? onRightToContent;
 
   const _TVGenreItem({
     Key? key,
+    required this.focusNode,
     required this.genre,
     required this.isSelected,
     required this.onSelect,
+    this.onUp,
+    this.onDown,
+    this.onRightToContent,
   }) : super(key: key);
 
   @override
@@ -304,6 +420,7 @@ class _TVGenreItemState extends State<_TVGenreItem> {
     final active = widget.isSelected;
 
     return Focus(
+      focusNode: widget.focusNode,
       onFocusChange: (focused) {
         setState(() {
           _isFocused = focused;
@@ -312,6 +429,23 @@ class _TVGenreItemState extends State<_TVGenreItem> {
       onKeyEvent: (node, event) {
         if (event is KeyDownEvent) {
           final key = event.logicalKey;
+
+          if (key == LogicalKeyboardKey.arrowUp && widget.onUp != null) {
+            widget.onUp!();
+            return KeyEventResult.handled;
+          }
+
+          if (key == LogicalKeyboardKey.arrowDown && widget.onDown != null) {
+            widget.onDown!();
+            return KeyEventResult.handled;
+          }
+
+          if (key == LogicalKeyboardKey.arrowRight &&
+              widget.onRightToContent != null) {
+            widget.onRightToContent!();
+            return KeyEventResult.handled;
+          }
+
           if (key == LogicalKeyboardKey.select ||
               key == LogicalKeyboardKey.enter ||
               key == LogicalKeyboardKey.numpadEnter ||

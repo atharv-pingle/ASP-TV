@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/channel.dart';
 import '../services/channel_service.dart';
 import '../theme/tv_theme.dart';
+import '../services/epg_service.dart';
 import '../widgets/tv_quick_guide.dart';
 
 enum VideoScaleMode { stretch, fit, zoom }
@@ -297,7 +298,25 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
         key.keyId == 0x00100000004; // KEYCODE_BACK
   }
 
+  int _currentAudioIndex = 0;
+
+  void _cycleAudioLanguage() {
+    final audios = _currentChannel.audioLanguages;
+    if (audios.isEmpty) return;
+    setState(() {
+      _currentAudioIndex = (_currentAudioIndex + 1) % audios.length;
+    });
+    final selectedAudio = audios[_currentAudioIndex];
+    _triggerHud('Audio: $selectedAudio');
+    _scheduleOsdHide();
+  }
+
   List<_PlayerControlItem> _getControlItems() {
+    final audios = _currentChannel.audioLanguages;
+    final currentAudio = audios.isNotEmpty
+        ? audios[_currentAudioIndex % audios.length]
+        : 'Default';
+
     return [
       _PlayerControlItem(
         icon: Icons.format_list_bulleted_rounded,
@@ -314,6 +333,12 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
         icon: Icons.history_rounded,
         label: _previousChannel != null ? 'Recall CH' : 'Recall',
         onTap: _recallPreviousChannel,
+      ),
+      _PlayerControlItem(
+        icon: Icons.audiotrack_rounded,
+        label: 'Audio: $currentAudio',
+        isHighlighted: audios.length > 1,
+        onTap: _cycleAudioLanguage,
       ),
       _PlayerControlItem(
         icon: _getScaleModeIcon(),
@@ -377,6 +402,7 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
         setState(() {
           _showQuickGuide = false;
         });
+        _focusNode.requestFocus();
         _scheduleOsdHide();
         return KeyEventResult.handled;
       }
@@ -817,48 +843,77 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
 
                             // Channel Title & Metadata
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    _currentChannel.name,
-                                    style: const TextStyle(
-                                      fontSize: 19,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Row(
+                              child: Builder(
+                                builder: (context) {
+                                  final liveProgram =
+                                      EpgService.instance.getCurrentProgram(_currentChannel);
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: TVTheme.accentRed,
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: const Text(
-                                          'LIVE',
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
+                                      Text(
+                                        _currentChannel.name,
+                                        style: const TextStyle(
+                                          fontSize: 19,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        _currentChannel.languageName,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: TVTheme.textSecondary,
-                                        ),
+                                      const SizedBox(height: 3),
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: TVTheme.accentRed,
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: const Text(
+                                              'LIVE',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            _currentChannel.languageName,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: TVTheme.textSecondary,
+                                            ),
+                                          ),
+                                          if (liveProgram != null) ...[
+                                            const SizedBox(width: 10),
+                                            Flexible(
+                                              child: Text(
+                                                '•  ${liveProgram.title}',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: TVTheme.focusColor,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              '(${liveProgram.timeFormatted})',
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                color: TVTheme.textMuted,
+                                              ),
+                                            ),
+                                          ],
+                                        ],
                                       ),
                                     ],
-                                  ),
-                                ],
+                                  );
+                                },
                               ),
                             ),
                           ],
@@ -898,12 +953,14 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                       setState(() {
                         _showQuickGuide = false;
                       });
+                      _focusNode.requestFocus();
                       _playChannel(ch);
                     },
                     onClose: () {
                       setState(() {
                         _showQuickGuide = false;
                       });
+                      _focusNode.requestFocus();
                       _scheduleOsdHide();
                     },
                   ),

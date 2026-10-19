@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/channel.dart';
+import '../services/epg_service.dart';
 import '../theme/tv_theme.dart';
 
 class TVChannelCard extends StatefulWidget {
@@ -10,6 +11,7 @@ class TVChannelCard extends StatefulWidget {
   final VoidCallback onSelect;
   final VoidCallback onToggleFavorite;
   final bool autoFocus;
+  final FocusNode? focusNode;
 
   const TVChannelCard({
     Key? key,
@@ -17,6 +19,7 @@ class TVChannelCard extends StatefulWidget {
     required this.onSelect,
     required this.onToggleFavorite,
     this.autoFocus = false,
+    this.focusNode,
   }) : super(key: key);
 
   @override
@@ -173,6 +176,7 @@ class _TVChannelCardState extends State<TVChannelCard> {
   @override
   Widget build(BuildContext context) {
     return Focus(
+      focusNode: widget.focusNode,
       autofocus: widget.autoFocus,
       onFocusChange: (focused) {
         setState(() {
@@ -253,13 +257,36 @@ class _TVChannelCardState extends State<TVChannelCard> {
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 14,
                           fontWeight:
                               _isFocused ? FontWeight.bold : FontWeight.w600,
                           color: _isFocused
                               ? TVTheme.focusColor
                               : TVTheme.textPrimary,
                         ),
+                      ),
+                      Builder(
+                        builder: (context) {
+                          final liveProgram =
+                              EpgService.instance.getCurrentProgram(widget.channel);
+                          if (liveProgram == null) return const SizedBox.shrink();
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              liveProgram.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: _isFocused
+                                    ? Colors.white70
+                                    : TVTheme.textMuted,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
