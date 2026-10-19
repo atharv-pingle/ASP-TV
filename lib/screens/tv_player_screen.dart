@@ -38,6 +38,10 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
   bool _showOsd = true;
   Timer? _osdTimer;
   bool _showQuickGuide = false;
+  bool _showBottomBar = false;
+  int _focusedControlIndex = 0;
+  Timer? _bottomBarTimer;
+  Channel? _previousChannel;
 
   VideoScaleMode _scaleMode = VideoScaleMode.stretch;
   String _hudMessage = '';
@@ -50,7 +54,7 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
     super.initState();
     _currentChannel = widget.initialChannel;
     _loadScaleModePreference();
-    _playChannel(_currentChannel);
+    _playChannel(_currentChannel, isInitial: true);
   }
 
   void _loadScaleModePreference() async {
@@ -72,10 +76,36 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
     } catch (_) {}
   }
 
-  void _playChannel(Channel channel) {
+  void _playChannel(Channel channel, {bool isInitial = false}) {
+    if (!isInitial && _currentChannel.id != channel.id) {
+      _previousChannel = _currentChannel;
+    }
     _currentChannel = channel;
     _currentStreamIndex = 0;
+    widget.channelService.recordWatchedChannel(channel);
     _startStream();
+  }
+
+  void _recallPreviousChannel() {
+    if (_previousChannel != null) {
+      final prev = _previousChannel!;
+      _showHudMessage('Recalled ${prev.name}');
+      _playChannel(prev);
+    } else {
+      _showHudMessage('No previous channel to recall');
+    }
+  }
+
+  void _scheduleBottomBarHide() {
+    _bottomBarTimer?.cancel();
+    _bottomBarTimer = Timer(const Duration(seconds: 8), () {
+      if (mounted && _showBottomBar) {
+        setState(() {
+          _showBottomBar = false;
+        });
+        _scheduleOsdHide();
+      }
+    });
   }
 
   void _startStream() {
@@ -225,7 +255,7 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
   void _scheduleOsdHide() {
     _osdTimer?.cancel();
     _osdTimer = Timer(const Duration(seconds: 4), () {
-      if (mounted && !_hasError && !_showQuickGuide) {
+      if (mounted && !_hasError && !_showQuickGuide && !_showBottomBar) {
         setState(() {
           _showOsd = false;
         });
@@ -249,6 +279,81 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
     }
   }
 
+  bool _isSelectKey(LogicalKeyboardKey key) {
+    return key == LogicalKeyboardKey.select ||
+        key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.numpadEnter ||
+        key == LogicalKeyboardKey.space ||
+        key == LogicalKeyboardKey.gameButtonA ||
+        key.keyId == 0x00100000017 || // KEYCODE_DPAD_CENTER
+        key.keyId == 0x00100000042 || // KEYCODE_ENTER
+        key.keyLabel.toLowerCase() == 'select' ||
+        key.keyLabel.toLowerCase() == 'enter';
+  }
+
+  bool _isBackKey(LogicalKeyboardKey key) {
+    return key == LogicalKeyboardKey.escape ||
+        key == LogicalKeyboardKey.goBack ||
+        key.keyId == 0x00100000004; // KEYCODE_BACK
+  }
+
+  List<_PlayerControlItem> _getControlItems() {
+    return [
+      _PlayerControlItem(
+        icon: Icons.format_list_bulleted_rounded,
+        label: 'Guide',
+        onTap: () {
+          setState(() {
+            _showBottomBar = false;
+            _showQuickGuide = true;
+            _showOsd = true;
+          });
+        },
+      ),
+      _PlayerControlItem(
+        icon: Icons.history_rounded,
+        label: _previousChannel != null ? 'Recall CH' : 'Recall',
+        onTap: _recallPreviousChannel,
+      ),
+      _PlayerControlItem(
+        icon: _getScaleModeIcon(),
+        label: _getScaleModeLabel(),
+        isHighlighted: _scaleMode == VideoScaleMode.stretch,
+        onTap: _cycleScaleMode,
+      ),
+      if (_currentChannel.streams.length > 1)
+        _PlayerControlItem(
+          icon: Icons.alt_route_rounded,
+          label: 'Stream ${_currentStreamIndex + 1}/${_currentChannel.streams.length}',
+          onTap: _cycleStreamMirror,
+        ),
+      _PlayerControlItem(
+        icon: _currentChannel.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+        label: _currentChannel.isFavorite ? 'Favorited' : 'Favorite',
+        isHighlighted: _currentChannel.isFavorite,
+        onTap: () {
+          widget.channelService.toggleFavorite(_currentChannel);
+          setState(() {});
+        },
+      ),
+      _PlayerControlItem(
+        icon: Icons.refresh_rounded,
+        label: 'Reload',
+        onTap: () {
+          _startStream();
+          _showHudMessage('Reloading stream...');
+        },
+      ),
+      _PlayerControlItem(
+        icon: Icons.arrow_back_rounded,
+        label: 'Exit',
+        onTap: () {
+          Navigator.of(context).pop();
+        },
+      ),
+    ];
+  }
+
   KeyEventResult _handleKeyEvent(FocusNode node, KeyEvent event) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
@@ -257,74 +362,100 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
     // Detect Channel Up (CH+ / PageUp / ArrowUp / keycode 166)
     final isChannelUp = key == LogicalKeyboardKey.channelUp ||
         key == LogicalKeyboardKey.pageUp ||
-        key == LogicalKeyboardKey.arrowUp ||
         key.keyId == 0x001000000a6 || // KEYCODE_CHANNEL_UP
         key.keyLabel.toLowerCase().contains('channel up');
 
     // Detect Channel Down (CH- / PageDown / ArrowDown / keycode 167)
     final isChannelDown = key == LogicalKeyboardKey.channelDown ||
         key == LogicalKeyboardKey.pageDown ||
-        key == LogicalKeyboardKey.arrowDown ||
         key.keyId == 0x001000000a7 || // KEYCODE_CHANNEL_DOWN
         key.keyLabel.toLowerCase().contains('channel down');
 
-    // Channel Switching
-    if (isChannelUp) {
-      if (!_showQuickGuide) {
-        _prevChannel();
-        return KeyEventResult.handled;
-      }
-    }
-
-    if (isChannelDown) {
-      if (!_showQuickGuide) {
-        _nextChannel();
-        return KeyEventResult.handled;
-      }
-    }
-
-    // Left Arrow: Cycle Video Stretch / Fit mode
-    if (key == LogicalKeyboardKey.arrowLeft && !_showQuickGuide) {
-      _cycleScaleMode();
-      return KeyEventResult.handled;
-    }
-
-    // Right Arrow: Switch stream mirror if available
-    if (key == LogicalKeyboardKey.arrowRight && !_showQuickGuide) {
-      if (_currentChannel.streams.length > 1) {
-        _cycleStreamMirror();
-        return KeyEventResult.handled;
-      }
-    }
-
-    // Select / OK / Enter: Toggle Quick Guide
-    if (key == LogicalKeyboardKey.select ||
-        key == LogicalKeyboardKey.enter ||
-        key == LogicalKeyboardKey.numpadEnter ||
-        key == LogicalKeyboardKey.space ||
-        key == LogicalKeyboardKey.gameButtonA ||
-        key.keyId == 0x00100000017 || // KEYCODE_DPAD_CENTER
-        key.keyId == 0x00100000042 || // KEYCODE_ENTER
-        key.keyLabel.toLowerCase() == 'select' ||
-        key.keyLabel.toLowerCase() == 'enter') {
-      setState(() {
-        _showQuickGuide = !_showQuickGuide;
-        _showOsd = true;
-      });
-      if (!_showQuickGuide) _scheduleOsdHide();
-      return KeyEventResult.handled;
-    }
-
-    // Back / Escape: Exit quick guide or return to Home
-    if (key == LogicalKeyboardKey.escape ||
-        key == LogicalKeyboardKey.goBack) {
-      if (_showQuickGuide) {
+    // 1. When Quick Guide Side Drawer is Open
+    if (_showQuickGuide) {
+      if (_isBackKey(key) || key == LogicalKeyboardKey.arrowLeft) {
         setState(() {
           _showQuickGuide = false;
         });
         _scheduleOsdHide();
         return KeyEventResult.handled;
       }
+      return KeyEventResult.ignored;
+    }
+
+    // 2. When Bottom Controls Bar is Open
+    if (_showBottomBar) {
+      final items = _getControlItems();
+
+      if (key == LogicalKeyboardKey.arrowLeft) {
+        setState(() {
+          _focusedControlIndex = (_focusedControlIndex - 1 + items.length) % items.length;
+        });
+        _scheduleBottomBarHide();
+        return KeyEventResult.handled;
+      }
+
+      if (key == LogicalKeyboardKey.arrowRight) {
+        setState(() {
+          _focusedControlIndex = (_focusedControlIndex + 1) % items.length;
+        });
+        _scheduleBottomBarHide();
+        return KeyEventResult.handled;
+      }
+
+      if (_isSelectKey(key)) {
+        if (_focusedControlIndex >= 0 && _focusedControlIndex < items.length) {
+          items[_focusedControlIndex].onTap();
+        }
+        return KeyEventResult.handled;
+      }
+
+      if (key == LogicalKeyboardKey.arrowUp || _isBackKey(key)) {
+        setState(() {
+          _showBottomBar = false;
+        });
+        _scheduleOsdHide();
+        return KeyEventResult.handled;
+      }
+
+      return KeyEventResult.handled;
+    }
+
+    // 3. Normal Clean Video Watching Mode
+    if (isChannelUp) {
+      _prevChannel();
+      return KeyEventResult.handled;
+    }
+
+    if (isChannelDown) {
+      _nextChannel();
+      return KeyEventResult.handled;
+    }
+
+    // D-pad Down: Open Bottom Control Bar
+    if (key == LogicalKeyboardKey.arrowDown) {
+      setState(() {
+        _showBottomBar = true;
+        _showOsd = true;
+        _focusedControlIndex = 0;
+      });
+      _scheduleBottomBarHide();
+      return KeyEventResult.handled;
+    }
+
+    // Select / OK: Open Side Quick Channel Guide
+    if (_isSelectKey(key)) {
+      setState(() {
+        _showQuickGuide = true;
+        _showOsd = true;
+      });
+      return KeyEventResult.handled;
+    }
+
+    // Back: Return to Channel Guide Home Screen
+    if (_isBackKey(key)) {
+      Navigator.of(context).pop();
+      return KeyEventResult.handled;
     }
 
     return KeyEventResult.ignored;
@@ -334,6 +465,7 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
   void dispose() {
     _osdTimer?.cancel();
     _hudTimer?.cancel();
+    _bottomBarTimer?.cancel();
     _controller?.removeListener(_checkStreamHealth);
     _controller?.dispose();
     _focusNode.dispose();
@@ -580,14 +712,14 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                   ),
                 ),
 
-              // 5. Leanback TV Player OSD (Bottom Navigation Overlay)
-              if (_showOsd)
+              // 5. Leanback TV Player OSD & Bottom Controls Menu
+              if (_showOsd || _showBottomBar)
                 Positioned(
                   left: 0,
                   right: 0,
                   bottom: 0,
                   child: Container(
-                    padding: const EdgeInsets.fromLTRB(28, 20, 28, 24),
+                    padding: const EdgeInsets.fromLTRB(28, 18, 28, 22),
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         colors: [Colors.transparent, Colors.black87, Colors.black],
@@ -602,192 +734,155 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                         )
                       ],
                     ),
-                    child: Row(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Channel Number
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: TVTheme.focusColor.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: TVTheme.focusColor),
-                          ),
-                          child: Text(
-                            'CH ${channelIndex.toString().padLeft(2, '0')}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: TVTheme.focusColor,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-
-                        // Channel Logo
-                        if (_currentChannel.logo.isNotEmpty)
-                          SizedBox(
-                            width: 48,
-                            height: 48,
-                            child: _currentChannel.logo.startsWith('assets/')
-                                ? Image.asset(
-                                    _currentChannel.logo,
-                                    fit: BoxFit.contain,
-                                    errorBuilder: (context, error, stackTrace) => Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.08),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Icon(Icons.live_tv_rounded, size: 28, color: TVTheme.focusColor),
-                                    ),
-                                  )
-                                : CachedNetworkImage(
-                                    imageUrl: _currentChannel.logo,
-                                    fit: BoxFit.contain,
-                                    httpHeaders: const {
-                                      'User-Agent':
-                                          'Mozilla/5.0 (Linux; Android 12; Android TV; Build/STT2.220920.015) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                                    },
-                                    errorWidget: (context, url, error) => Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.08),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: const Icon(Icons.live_tv_rounded, size: 28, color: TVTheme.focusColor),
-                                    ),
-                                  ),
-                          ),
-                        const SizedBox(width: 16),
-
-                        // Channel Title & Language
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                _currentChannel.name,
+                        // Top Info Row: Channel Details & TV Remote Hints
+                        Row(
+                          children: [
+                            // Channel Number
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: TVTheme.focusColor.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: TVTheme.focusColor),
+                              ),
+                              child: Text(
+                                'CH ${channelIndex.toString().padLeft(2, '0')}',
                                 style: const TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: TVTheme.focusColor,
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Row(
+                            ),
+                            const SizedBox(width: 16),
+
+                            // Channel Logo
+                            if (_currentChannel.logo.isNotEmpty)
+                              SizedBox(
+                                width: 44,
+                                height: 44,
+                                child: _currentChannel.logo.startsWith('assets/')
+                                    ? Image.asset(
+                                        _currentChannel.logo,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (context, error, stackTrace) => Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.08),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: const Icon(Icons.live_tv_rounded, size: 26, color: TVTheme.focusColor),
+                                        ),
+                                      )
+                                    : CachedNetworkImage(
+                                        imageUrl: _currentChannel.logo,
+                                        fit: BoxFit.contain,
+                                        httpHeaders: const {
+                                          'User-Agent':
+                                              'Mozilla/5.0 (Linux; Android 12; Android TV; Build/STT2.220920.015) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                                        },
+                                        errorWidget: (context, url, error) => Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.08),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: const Icon(Icons.live_tv_rounded, size: 26, color: TVTheme.focusColor),
+                                        ),
+                                      ),
+                              ),
+                            const SizedBox(width: 14),
+
+                            // Channel Title & Metadata
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: TVTheme.accentRed,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: const Text(
-                                      'LIVE',
-                                      style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
                                   Text(
-                                    _currentChannel.languageName,
+                                    _currentChannel.name,
                                     style: const TextStyle(
-                                      fontSize: 13,
-                                      color: TVTheme.textSecondary,
+                                      fontSize: 19,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
-
-                                  // Video Stretch / Scale Mode Button
-                                  GestureDetector(
-                                    onTap: _cycleScaleMode,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 9, vertical: 3),
-                                      decoration: BoxDecoration(
-                                        color: _scaleMode == VideoScaleMode.stretch
-                                            ? TVTheme.focusColor
-                                            : Colors.white.withOpacity(0.12),
-                                        borderRadius: BorderRadius.circular(6),
-                                        border: Border.all(
-                                          color: _scaleMode == VideoScaleMode.stretch
-                                              ? Colors.white
-                                              : TVTheme.focusColor.withOpacity(0.5),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            _getScaleModeIcon(),
-                                            size: 14,
-                                            color: _scaleMode == VideoScaleMode.stretch
-                                                ? Colors.black87
-                                                : Colors.white,
-                                          ),
-                                          const SizedBox(width: 5),
-                                          Text(
-                                            _getScaleModeLabel(),
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.bold,
-                                              color: _scaleMode == VideoScaleMode.stretch
-                                                  ? Colors.black87
-                                                  : Colors.white,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-
-                                  if (_currentChannel.streams.length > 1) ...[
-                                    const SizedBox(width: 10),
-                                    GestureDetector(
-                                      onTap: _cycleStreamMirror,
-                                      child: Container(
+                                  const SizedBox(height: 3),
+                                  Row(
+                                    children: [
+                                      Container(
                                         padding: const EdgeInsets.symmetric(
-                                            horizontal: 8, vertical: 3),
+                                            horizontal: 6, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: TVTheme.focusColor.withOpacity(0.15),
-                                          borderRadius: BorderRadius.circular(6),
-                                          border: Border.all(
-                                              color: TVTheme.focusColor.withOpacity(0.4)),
+                                          color: TVTheme.accentRed,
+                                          borderRadius: BorderRadius.circular(4),
                                         ),
-                                        child: Text(
-                                          '⚡ Stream ${_currentStreamIndex + 1}/${_currentChannel.streams.length}',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w600,
-                                            color: TVTheme.focusColor,
+                                        child: const Text(
+                                          'LIVE',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        _currentChannel.languageName,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: TVTheme.textSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ],
                               ),
-                            ],
-                          ),
-                        ),
+                            ),
 
-                        // TV Remote Hints
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _buildKeyHint('◄', 'Stretch'),
-                            const SizedBox(width: 12),
-                            _buildKeyHint('CH ▲/▼', 'Channel'),
-                            const SizedBox(width: 12),
-                            _buildKeyHint('OK', 'Guide'),
-                            const SizedBox(width: 12),
-                            _buildKeyHint('BACK', 'Home'),
+                            // Dynamic TV Remote Hints
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: _showBottomBar
+                                  ? [
+                                      _buildKeyHint('◄ / ►', 'Navigate'),
+                                      const SizedBox(width: 10),
+                                      _buildKeyHint('OK', 'Select'),
+                                      const SizedBox(width: 10),
+                                      _buildKeyHint('▲ / BACK', 'Hide Menu'),
+                                    ]
+                                  : [
+                                      _buildKeyHint('▼', 'Controls Menu'),
+                                      const SizedBox(width: 10),
+                                      _buildKeyHint('OK', 'Guide'),
+                                      const SizedBox(width: 10),
+                                      _buildKeyHint('CH ▲/▼', 'Channel'),
+                                      const SizedBox(width: 10),
+                                      _buildKeyHint('BACK', 'Home'),
+                                    ],
+                            ),
                           ],
                         ),
+
+                        // Internal Menu: Focusable & Clickable Player Controls
+                        if (_showBottomBar) ...[
+                          const SizedBox(height: 14),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                for (int i = 0; i < _getControlItems().length; i++)
+                                  _buildControlButton(
+                                    _getControlItems()[i],
+                                    isFocused: _focusedControlIndex == i,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -823,6 +918,61 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
     );
   }
 
+  Widget _buildControlButton(_PlayerControlItem item, {required bool isFocused}) {
+    return GestureDetector(
+      onTap: item.onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isFocused
+              ? TVTheme.focusColor
+              : (item.isHighlighted
+                  ? TVTheme.focusColor.withOpacity(0.2)
+                  : Colors.white.withOpacity(0.1)),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isFocused
+                ? Colors.white
+                : (item.isHighlighted
+                    ? TVTheme.focusColor.withOpacity(0.5)
+                    : Colors.white.withOpacity(0.15)),
+            width: isFocused ? 2 : 1,
+          ),
+          boxShadow: isFocused
+              ? [
+                  BoxShadow(
+                    color: TVTheme.focusColor.withOpacity(0.4),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  )
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              item.icon,
+              size: 16,
+              color: isFocused ? Colors.black87 : Colors.white,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              item.label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isFocused ? FontWeight.bold : FontWeight.w600,
+                color: isFocused ? Colors.black87 : Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildKeyHint(String keyLabel, String action) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -853,4 +1003,18 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
       ),
     );
   }
+}
+
+class _PlayerControlItem {
+  final IconData icon;
+  final String label;
+  final bool isHighlighted;
+  final VoidCallback onTap;
+
+  _PlayerControlItem({
+    required this.icon,
+    required this.label,
+    this.isHighlighted = false,
+    required this.onTap,
+  });
 }

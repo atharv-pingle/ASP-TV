@@ -8,11 +8,13 @@ import '../models/language.dart';
 
 class ChannelService with ChangeNotifier {
   static const String _favoritesKey = 'tv_favorite_channel_ids';
+  static const String _recentChannelsKey = 'tv_recent_channel_ids';
   static const String _remoteCatalogUrl =
       'https://raw.githubusercontent.com/iptv-org/iptv/master/streams/in.m3u';
 
   List<Channel> _allChannels = [];
   Set<String> _favoriteIds = {};
+  List<String> _recentChannelIds = [];
   String _selectedLanguage = 'all';
   String _searchQuery = '';
   bool _isLoading = true;
@@ -22,15 +24,27 @@ class ChannelService with ChangeNotifier {
   String get searchQuery => _searchQuery;
   bool get isLoading => _isLoading;
 
+  List<Channel> get recentChannels {
+    final Map<String, Channel> channelMap = {for (var c in _allChannels) c.id: c};
+    final List<Channel> recents = [];
+    for (final id in _recentChannelIds) {
+      if (channelMap.containsKey(id)) {
+        recents.add(channelMap[id]!);
+      }
+    }
+    return recents;
+  }
+
   Future<void> initialize() async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      // 1. Load favorites from storage
+      // 1. Load favorites and recent channels from storage
       final prefs = await SharedPreferences.getInstance();
       final favList = prefs.getStringList(_favoritesKey) ?? [];
       _favoriteIds = favList.toSet();
+      _recentChannelIds = prefs.getStringList(_recentChannelsKey) ?? [];
 
       // 2. Load bundled channels cache
       final jsonString =
@@ -132,6 +146,22 @@ class ChannelService with ChangeNotifier {
       await prefs.setStringList(_favoritesKey, _favoriteIds.toList());
     } catch (e) {
       if (kDebugMode) print('Error saving favorites: $e');
+    }
+  }
+
+  Future<void> recordWatchedChannel(Channel channel) async {
+    _recentChannelIds.remove(channel.id);
+    _recentChannelIds.insert(0, channel.id);
+    if (_recentChannelIds.length > 12) {
+      _recentChannelIds = _recentChannelIds.sublist(0, 12);
+    }
+    notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList(_recentChannelsKey, _recentChannelIds);
+    } catch (e) {
+      if (kDebugMode) print('Error saving recent channels: $e');
     }
   }
 
