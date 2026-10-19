@@ -207,7 +207,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                             // Down arrow: exit search to channel grid or recents
                             if (key == LogicalKeyboardKey.arrowDown) {
                               _unfocusSearch();
-                              FocusScope.of(context).focusNext();
+                              FocusScope.of(context).nextFocus();
                               return KeyEventResult.handled;
                             }
 
@@ -215,7 +215,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                             if (key == LogicalKeyboardKey.arrowLeft &&
                                 _searchController.selection.baseOffset <= 0) {
                               _unfocusSearch();
-                              FocusScope.of(context).focusPrevious();
+                              FocusScope.of(context).previousFocus();
                               return KeyEventResult.handled;
                             }
 
@@ -473,7 +473,7 @@ class _TVRecentChannelCardState extends State<_TVRecentChannelCard> {
           width: 150,
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
-            color: _isFocused ? TVTheme.cardBackgroundFocus : TVTheme.cardBackground,
+            color: _isFocused ? TVTheme.cardFocusBackground : TVTheme.cardBackground,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: _isFocused ? TVTheme.focusColor : Colors.white.withOpacity(0.08),

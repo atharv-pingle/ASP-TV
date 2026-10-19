@@ -89,10 +89,10 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
   void _recallPreviousChannel() {
     if (_previousChannel != null) {
       final prev = _previousChannel!;
-      _showHudMessage('Recalled ${prev.name}');
+      _triggerHud('Recalled ${prev.name}');
       _playChannel(prev);
     } else {
-      _showHudMessage('No previous channel to recall');
+      _triggerHud('No previous channel to recall');
     }
   }
 
@@ -341,7 +341,7 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
         label: 'Reload',
         onTap: () {
           _startStream();
-          _showHudMessage('Reloading stream...');
+          _triggerHud('Reloading stream...');
         },
       ),
       _PlayerControlItem(
