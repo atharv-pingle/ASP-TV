@@ -14,7 +14,7 @@ class LanguageCategory {
   });
 
   static const List<LanguageCategory> defaultCategories = [
-    LanguageCategory(code: 'fav', name: 'Favorites', icon: '⭐'),
+    LanguageCategory(code: 'fav', name: 'Favorites & Recents', icon: '⭐'),
     LanguageCategory(code: 'all', name: 'All Channels', icon: '⚡'),
     LanguageCategory(code: 'mar', name: 'Marathi', icon: '🚩'),
     LanguageCategory(code: 'hin', name: 'Hindi', icon: '🇮🇳'),

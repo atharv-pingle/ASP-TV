@@ -523,8 +523,27 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
   Widget build(BuildContext context) {
     final channelIndex = widget.playlist.indexWhere((c) => c.id == _currentChannel.id) + 1;
 
-    return Scaffold(
-      backgroundColor: Colors.black,
+    return PopScope(
+      canPop: !_showQuickGuide && !_showBottomBar,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (_showQuickGuide) {
+          setState(() {
+            _showQuickGuide = false;
+          });
+          _scheduleOsdHide();
+          return;
+        }
+        if (_showBottomBar) {
+          setState(() {
+            _showBottomBar = false;
+          });
+          _scheduleOsdHide();
+          return;
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
       body: Focus(
         focusNode: _focusNode,
         autofocus: true,
@@ -893,8 +912,9 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildControlButton(_PlayerControlItem item, {required bool isFocused}) {
     return GestureDetector(

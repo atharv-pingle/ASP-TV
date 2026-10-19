@@ -37,6 +37,8 @@ class ChannelService with ChangeNotifier {
     return recents;
   }
 
+  List<Channel> get favoriteChannels => _allChannels.where((c) => c.isFavorite).toList();
+
   Future<void> initialize() async {
     _isLoading = true;
     notifyListeners();
