@@ -24,6 +24,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
   final FocusNode _searchFocusNode = FocusNode();
   final FocusNode _searchBarContainerFocusNode = FocusNode();
   final FocusNode _firstCardFocusNode = FocusNode(debugLabel: 'FirstCardFocusNode');
+  final Map<String, FocusNode> _cardFocusNodes = {};
   bool _isSearchEditing = false;
   bool _isSearchContainerFocused = false;
   DateTime? _lastBackPressTime;
@@ -63,6 +64,9 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
     _searchFocusNode.dispose();
     _searchBarContainerFocusNode.dispose();
     _firstCardFocusNode.dispose();
+    for (final node in _cardFocusNodes.values) {
+      node.dispose();
+    }
     widget.channelService.removeListener(_onServiceUpdate);
     super.dispose();
   }
@@ -91,7 +95,16 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
           widget.channelService.selectedCategory != savedCat) {
         widget.channelService.preserveSelection(savedLang, savedCat);
       }
-      _firstCardFocusNode.requestFocus();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          final targetNode = _cardFocusNodes[channel.id];
+          if (targetNode != null && targetNode.canRequestFocus) {
+            targetNode.requestFocus();
+          } else if (_firstCardFocusNode.canRequestFocus) {
+            _firstCardFocusNode.requestFocus();
+          }
+        }
+      });
     }
   }
 
@@ -255,9 +268,9 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                             children: [
                               Text(
                                 activeCat.icon,
-                                style: const TextStyle(fontSize: 22),
+                                style: const TextStyle(fontSize: 20),
                               ),
-                              const SizedBox(width: 10),
+                              const SizedBox(width: 8),
                               Flexible(
                                 child: Text(
                                   activeCat.code == 'fav'
@@ -270,16 +283,16 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.w800,
                                     color: TVTheme.textPrimary,
                                     letterSpacing: 0.2,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 10),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.05),
                                   borderRadius: BorderRadius.circular(12),
@@ -290,7 +303,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                       ? '${service.favoriteChannels.length} Fav • ${recents.length} Recent'
                                       : '${channels.length} Channels',
                                   style: const TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11,
                                     fontWeight: FontWeight.w600,
                                     color: TVTheme.focusColor,
                                   ),
@@ -360,9 +373,9 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                             onTap: _enterSearchEditing,
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 150),
-                              width: 280,
-                              height: 40,
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              width: 210,
+                              height: 38,
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
                               decoration: BoxDecoration(
                                 color: _isSearchContainerFocused
                                     ? const Color(0xFF262832)
@@ -456,11 +469,11 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 20),
+                        const SizedBox(width: 12),
 
                         // Clock (Free-My-TV Launcher style)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.04),
                             borderRadius: BorderRadius.circular(10),
@@ -468,12 +481,12 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.schedule_rounded, size: 15, color: TVTheme.focusColor.withOpacity(0.9)),
-                              const SizedBox(width: 8),
+                              Icon(Icons.schedule_rounded, size: 14, color: TVTheme.focusColor.withOpacity(0.9)),
+                              const SizedBox(width: 6),
                               Text(
                                 _currentTime,
                                 style: const TextStyle(
-                                  fontSize: 13,
+                                  fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                   color: TVTheme.textPrimary,
                                   letterSpacing: 0.3,
@@ -571,10 +584,14 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                 delegate: SliverChildBuilderDelegate(
                                   (context, index) {
                                     final channel = service.favoriteChannels[index];
+                                    final node = _cardFocusNodes.putIfAbsent(
+                                      channel.id,
+                                      () => FocusNode(debugLabel: 'Fav_${channel.id}'),
+                                    );
                                     return TVChannelCard(
                                       channel: channel,
                                       autoFocus: index == 0,
-                                      focusNode: index == 0 ? _firstCardFocusNode : null,
+                                      focusNode: index == 0 ? _firstCardFocusNode : node,
                                       onSelect: () => _openPlayer(channel, service.favoriteChannels),
                                       onToggleFavorite: () => service.toggleFavorite(channel),
                                     );
@@ -661,11 +678,15 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                 delegate: SliverChildBuilderDelegate(
                                   (context, index) {
                                     final channel = recents[index];
+                                    final node = _cardFocusNodes.putIfAbsent(
+                                      channel.id,
+                                      () => FocusNode(debugLabel: 'Rec_${channel.id}'),
+                                    );
                                     return TVChannelCard(
                                       channel: channel,
                                       focusNode: (service.favoriteChannels.isEmpty && index == 0)
                                           ? _firstCardFocusNode
-                                          : null,
+                                          : node,
                                       onSelect: () => _openPlayer(channel, recents),
                                       onToggleFavorite: () => service.toggleFavorite(channel),
                                     );
@@ -711,10 +732,14 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                 delegate: SliverChildBuilderDelegate(
                                   (context, index) {
                                     final channel = channels[index];
+                                    final node = _cardFocusNodes.putIfAbsent(
+                                      channel.id,
+                                      () => FocusNode(debugLabel: 'Card_${channel.id}'),
+                                    );
                                     return TVChannelCard(
                                       channel: channel,
                                       autoFocus: index == 0,
-                                      focusNode: index == 0 ? _firstCardFocusNode : null,
+                                      focusNode: index == 0 ? _firstCardFocusNode : node,
                                       onSelect: () => _openPlayer(channel, channels),
                                       onToggleFavorite: () => service.toggleFavorite(channel),
                                     );
