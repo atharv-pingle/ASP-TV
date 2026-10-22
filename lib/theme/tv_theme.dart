@@ -1,19 +1,35 @@
 import 'package:flutter/material.dart';
 
+/// TVTheme inspired by Free-My-TV dark launcher aesthetic:
+/// Deep OLED charcoal (#0B0B0D), frosted glass surfaces (#1B1C22),
+/// crisp off-white typography (#F5F5F7), Apple-style emerald live indicators (#30D158),
+/// and luminous high-contrast remote focus rings.
 class TVTheme {
-  static const Color background = Color(0xFF0A0F1D);
-  static const Color sidebarBackground = Color(0xFF0F172A);
-  static const Color cardBackground = Color(0xFF1E293B);
-  static const Color cardFocusBackground = Color(0xFF334155);
+  // Deep OLED Night palette
+  static const Color background = Color(0xFF0B0B0D);
+  static const Color backgroundSecondary = Color(0xFF141519);
+  static const Color sidebarBackground = Color(0xFF111216);
+  static const Color cardBackground = Color(0xFF1B1C22);
+  static const Color cardFocusBackground = Color(0xFF282932);
   
-  static const Color focusColor = Color(0xFF38BDF8); // Electric cyan
+  // Accents & Indicators
+  static const Color focusColor = Color(0xFF38BDF8); // Electric sky cyan
+  static const Color focusWhite = Color(0xFFFFFFFF);
   static const Color focusGlow = Color(0x6638BDF8);
-  static const Color accentRed = Color(0xFFEF4444); // Live tag
-  static const Color gold = Color(0xFFFBBF24); // Favorite star
+  static const Color liveGreen = Color(0xFF30D158); // Free-My-TV Apple live emerald
+  static const Color accentRed = Color(0xFFFF453A); // Live alert red
+  static const Color gold = Color(0xFFFFD60A); // Apple gold star
   
-  static const Color textPrimary = Color(0xFFF8FAFC);
-  static const Color textSecondary = Color(0xFF94A3B8);
-  static const Color textMuted = Color(0xFF64748B);
+  // Glassmorphic borders & fills
+  static const Color glassFill = Color(0x0FFFFFFF);
+  static const Color glassFillActive = Color(0x22FFFFFF);
+  static const Color glassBorder = Color(0x1AFFFFFF);
+  static const Color cardBorder = Color(0x14FFFFFF);
+
+  // Typography Colors
+  static const Color textPrimary = Color(0xFFF5F5F7);
+  static const Color textSecondary = Color(0xA6F5F5F7); // ~65% opacity
+  static const Color textMuted = Color(0x6BF5F5F7);     // ~42% opacity
 
   static ThemeData get theme {
     return ThemeData(
@@ -23,10 +39,10 @@ class TVTheme {
       canvasColor: sidebarBackground,
       colorScheme: const ColorScheme.dark(
         primary: focusColor,
-        secondary: accentRed,
+        secondary: liveGreen,
         surface: cardBackground,
       ),
-      fontFamily: 'Roboto',
+      fontFamily: 'Inter',
       textTheme: const TextTheme(
         headlineLarge: TextStyle(
           fontSize: 32,

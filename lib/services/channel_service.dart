@@ -136,6 +136,12 @@ class ChannelService with ChangeNotifier {
     notifyListeners();
   }
 
+  void preserveSelection(String language, String category) {
+    _selectedLanguage = language;
+    _selectedCategory = category;
+    notifyListeners();
+  }
+
   void setSearchQuery(String query) {
     _searchQuery = query;
     notifyListeners();

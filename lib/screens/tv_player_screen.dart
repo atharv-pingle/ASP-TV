@@ -480,6 +480,21 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
 
     // Back: Return to Channel Guide Home Screen
     if (_isBackKey(key)) {
+      if (_showQuickGuide) {
+        setState(() {
+          _showQuickGuide = false;
+        });
+        _focusNode.requestFocus();
+        _scheduleOsdHide();
+        return KeyEventResult.handled;
+      }
+      if (_showBottomBar) {
+        setState(() {
+          _showBottomBar = false;
+        });
+        _scheduleOsdHide();
+        return KeyEventResult.handled;
+      }
       Navigator.of(context).pop();
       return KeyEventResult.handled;
     }
@@ -550,7 +565,7 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
     final channelIndex = widget.playlist.indexWhere((c) => c.id == _currentChannel.id) + 1;
 
     return PopScope(
-      canPop: !_showQuickGuide && !_showBottomBar,
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
         if (_showQuickGuide) {
@@ -567,6 +582,7 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
           _scheduleOsdHide();
           return;
         }
+        Navigator.of(context).pop();
       },
       child: Scaffold(
         backgroundColor: Colors.black,

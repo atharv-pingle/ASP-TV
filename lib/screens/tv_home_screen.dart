@@ -19,6 +19,7 @@ class TVHomeScreen extends StatefulWidget {
 }
 
 class _TVHomeScreenState extends State<TVHomeScreen> {
+  final GlobalKey<TVSidebarState> _sidebarKey = GlobalKey<TVSidebarState>();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   final FocusNode _searchBarContainerFocusNode = FocusNode();
@@ -46,9 +47,11 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
     final hour = now.hour % 12 == 0 ? 12 : now.hour % 12;
     final minute = now.minute.toString().padLeft(2, '0');
     final ampm = now.hour >= 12 ? 'PM' : 'AM';
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final month = months[now.month - 1];
     if (mounted) {
       setState(() {
-        _currentTime = '$hour:$minute $ampm';
+        _currentTime = '$month ${now.day} • $hour:$minute $ampm';
       });
     }
   }
@@ -64,9 +67,13 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
     super.dispose();
   }
 
-  void _openPlayer(Channel channel, List<Channel> currentList) {
+  void _openPlayer(Channel channel, List<Channel> currentList) async {
+    // Preserve the exact language and subcategory state
+    final savedLang = widget.channelService.selectedLanguage;
+    final savedCat = widget.channelService.selectedCategory;
     widget.channelService.recordWatchedChannel(channel);
-    Navigator.of(context).push(
+
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => TVPlayerScreen(
           initialChannel: channel,
@@ -75,6 +82,17 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
         ),
       ),
     );
+
+    // Guaranteed State & Menu Preservation:
+    // When returning from stream playback, maintain the exact language and category
+    // the user was browsing, and request focus on the channel grid!
+    if (mounted) {
+      if (widget.channelService.selectedLanguage != savedLang ||
+          widget.channelService.selectedCategory != savedCat) {
+        widget.channelService.preserveSelection(savedLang, savedCat);
+      }
+      _firstCardFocusNode.requestFocus();
+    }
   }
 
   void _enterSearchEditing() {
@@ -138,8 +156,26 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
           service.setSearchQuery('');
           return;
         }
+
+        // If focus is in content grid or search bar, navigate back to sidebar
+        // without resetting the active menu or category!
+        if (_sidebarKey.currentState != null && !_sidebarKey.currentState!.hasSidebarFocus()) {
+          _sidebarKey.currentState?.focusActive();
+          return;
+        }
+
+        // Hierarchical Back Navigation within sidebar:
+        // 1. Step back from subcategory to parent language
+        if (service.selectedCategory != 'all') {
+          service.selectCategory('all');
+          _sidebarKey.currentState?.focusActive();
+          return;
+        }
+
+        // 2. Step back from specific language to 'all'
         if (service.selectedLanguage != 'all') {
           service.selectLanguage('all');
+          _sidebarKey.currentState?.focusActive();
           return;
         }
 
@@ -159,12 +195,12 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                   ),
                 ],
               ),
-              backgroundColor: const Color(0xFF1E293B),
+              backgroundColor: const Color(0xFF1B1C22),
               behavior: SnackBarBehavior.floating,
               duration: const Duration(seconds: 2),
               margin: const EdgeInsets.only(bottom: 24, left: 100, right: 100),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 side: BorderSide(color: TVTheme.focusColor.withOpacity(0.6), width: 1.5),
               ),
             ),
@@ -177,8 +213,9 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
         backgroundColor: TVTheme.background,
         body: Row(
           children: [
-            // Left Navigation Rail for Remote Control
+            // Left Navigation Rail for Remote Control (Free-My-TV Dark Theme)
             TVSidebar(
+              key: _sidebarKey,
               categories: categories,
               selectedCategory: service.selectedLanguage,
               selectedGenre: service.selectedCategory,
@@ -198,10 +235,18 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top TV App Bar
+                  // Top TV App Bar (Free-My-TV Dark Launcher Aesthetic)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                    color: TVTheme.background,
+                    decoration: BoxDecoration(
+                      color: TVTheme.background,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.white.withOpacity(0.06),
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
                     child: Row(
                       children: [
                         // Active category title & badge (Protected against overflow)
@@ -226,18 +271,19 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
                                     fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w800,
                                     color: TVTheme.textPrimary,
+                                    letterSpacing: 0.2,
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 12),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: TVTheme.focusColor.withOpacity(0.15),
+                                  color: Colors.white.withOpacity(0.05),
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: TVTheme.focusColor.withOpacity(0.5)),
+                                  border: Border.all(color: TVTheme.focusColor.withOpacity(0.4), width: 1.0),
                                 ),
                                 child: Text(
                                   activeCat.code == 'fav'
@@ -319,8 +365,8 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 12),
                               decoration: BoxDecoration(
                                 color: _isSearchContainerFocused
-                                    ? TVTheme.focusColor.withOpacity(0.18)
-                                    : TVTheme.cardBackground,
+                                    ? const Color(0xFF262832)
+                                    : Colors.white.withOpacity(0.04),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: _isSearchContainerFocused
@@ -331,8 +377,8 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                 boxShadow: _isSearchContainerFocused
                                     ? [
                                         BoxShadow(
-                                          color: TVTheme.focusColor.withOpacity(0.4),
-                                          blurRadius: 10,
+                                          color: TVTheme.focusColor.withOpacity(0.35),
+                                          blurRadius: 14,
                                           offset: const Offset(0, 2),
                                         ),
                                       ]
@@ -412,23 +458,25 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                         ),
                         const SizedBox(width: 20),
 
-                        // Clock
+                        // Clock (Free-My-TV Launcher style)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.06),
-                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.white.withOpacity(0.04),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.white.withOpacity(0.08)),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.access_time_rounded, size: 16, color: TVTheme.textSecondary),
-                              const SizedBox(width: 6),
+                              Icon(Icons.schedule_rounded, size: 15, color: TVTheme.focusColor.withOpacity(0.9)),
+                              const SizedBox(width: 8),
                               Text(
                                 _currentTime,
                                 style: const TextStyle(
                                   fontSize: 13,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
                                   color: TVTheme.textPrimary,
+                                  letterSpacing: 0.3,
                                 ),
                               ),
                             ],

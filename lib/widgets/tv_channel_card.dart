@@ -6,6 +6,9 @@ import '../models/channel.dart';
 import '../services/epg_service.dart';
 import '../theme/tv_theme.dart';
 
+/// Free-My-TV inspired dark launcher channel tile:
+/// Sleek frosted glass surface, elevated logo stage, emerald LIVE indicator,
+/// and luminous high-contrast white focus elevation with deep 3D drop shadow.
 class TVChannelCard extends StatefulWidget {
   final Channel channel;
   final VoidCallback onSelect;
@@ -82,9 +85,13 @@ class _TVChannelCardState extends State<TVChannelCard> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: const Duration(milliseconds: 1800),
-        backgroundColor: widget.channel.isFavorite ? TVTheme.cardFocusBackground : const Color(0xFF1E293B),
+        backgroundColor: const Color(0xFF1B1C22),
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.only(bottom: 24, left: 32, right: 32),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(color: TVTheme.gold.withOpacity(0.5), width: 1.2),
+        ),
         content: Row(
           children: [
             Icon(
@@ -98,7 +105,11 @@ class _TVChannelCardState extends State<TVChannelCard> {
                 widget.channel.isFavorite
                     ? '⭐ Added "${widget.channel.name}" to Favorites'
                     : 'Removed "${widget.channel.name}" from Favorites',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ),
           ],
@@ -127,11 +138,11 @@ class _TVChannelCardState extends State<TVChannelCard> {
         memCacheWidth: 400,
         placeholder: (context, url) => Center(
           child: SizedBox(
-            width: 28,
-            height: 28,
+            width: 26,
+            height: 26,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              color: TVTheme.focusColor.withOpacity(0.5),
+              color: TVTheme.focusColor.withOpacity(0.4),
             ),
           ),
         ),
@@ -149,20 +160,20 @@ class _TVChannelCardState extends State<TVChannelCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.06),
+        color: Colors.white.withOpacity(0.04),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white12),
+        border: Border.all(color: Colors.white10),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.live_tv_rounded, size: 36, color: TVTheme.focusColor),
+          const Icon(Icons.live_tv_rounded, size: 34, color: TVTheme.focusColor),
           const SizedBox(height: 6),
           Text(
             initials.toUpperCase(),
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w900,
               color: Colors.white70,
               letterSpacing: 1.2,
@@ -204,53 +215,73 @@ class _TVChannelCardState extends State<TVChannelCard> {
           _showFavoriteFeedback();
         },
         child: AnimatedScale(
-          scale: _isFocused ? 1.05 : 1.0,
+          scale: _isFocused ? 1.08 : 1.0,
           duration: const Duration(milliseconds: 180),
           curve: Curves.easeOutCubic,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),
             decoration: BoxDecoration(
-              color: _isFocused
-                  ? TVTheme.cardFocusBackground
-                  : TVTheme.cardBackground,
-              borderRadius: BorderRadius.circular(16),
+              // Free-My-TV dark launcher card styling
+              gradient: LinearGradient(
+                colors: _isFocused
+                    ? [const Color(0xFF2E303A), const Color(0xFF22242D)]
+                    : [const Color(0xFF1E2027), const Color(0xFF14151B)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: _isFocused ? TVTheme.focusColor : Colors.white10,
-                width: _isFocused ? 3.0 : 1.0,
+                color: _isFocused ? Colors.white : Colors.white.withOpacity(0.08),
+                width: _isFocused ? 2.5 : 1.0,
               ),
               boxShadow: _isFocused
                   ? [
                       BoxShadow(
-                        color: TVTheme.focusGlow,
-                        blurRadius: 18,
+                        color: Colors.black.withOpacity(0.65),
+                        blurRadius: 26,
                         spreadRadius: 2,
-                        offset: const Offset(0, 4),
+                        offset: const Offset(0, 8),
+                      ),
+                      BoxShadow(
+                        color: TVTheme.focusColor.withOpacity(0.35),
+                        blurRadius: 18,
+                        spreadRadius: 1,
                       )
                     ]
                   : [
-                      const BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 6,
-                        offset: Offset(0, 2),
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
                       )
                     ],
             ),
             child: Stack(
               children: [
-                // Main Content: Prominent Logo + Channel Name Text Underneath
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   child: Column(
                     children: [
-                      // Prominent Channel Logo
+                      // Elevated Clean Logo Stage
                       Expanded(
-                        child: Center(
-                          child: _buildLogo(),
+                        child: Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.white.withOpacity(0.04)),
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: _buildLogo(),
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
 
-                      // Channel Name Text Underneath
+                      // Channel Name Text
                       Text(
                         widget.channel.name,
                         maxLines: 1,
@@ -258,33 +289,54 @@ class _TVChannelCardState extends State<TVChannelCard> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight:
-                              _isFocused ? FontWeight.bold : FontWeight.w600,
-                          color: _isFocused
-                              ? TVTheme.focusColor
-                              : TVTheme.textPrimary,
+                          fontWeight: _isFocused ? FontWeight.w800 : FontWeight.w600,
+                          color: _isFocused ? Colors.white : TVTheme.textPrimary,
+                          letterSpacing: 0.2,
                         ),
                       ),
+                      const SizedBox(height: 2),
+
+                      // EPG Program or Live Tag
                       Builder(
                         builder: (context) {
                           final liveProgram =
                               EpgService.instance.getCurrentProgram(widget.channel);
-                          if (liveProgram == null) return const SizedBox.shrink();
-                          return Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: Text(
-                              liveProgram.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                                color: _isFocused
-                                    ? Colors.white70
-                                    : TVTheme.textMuted,
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: TVTheme.liveGreen,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: TVTheme.liveGreen.withOpacity(0.8),
+                                      blurRadius: 6,
+                                      spreadRadius: 1,
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: 6),
+                              Flexible(
+                                child: Text(
+                                  liveProgram != null ? liveProgram.title : 'LIVE',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: _isFocused
+                                        ? Colors.white.withOpacity(0.85)
+                                        : TVTheme.textMuted,
+                                  ),
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),
@@ -292,7 +344,7 @@ class _TVChannelCardState extends State<TVChannelCard> {
                   ),
                 ),
 
-                // Subtle Favorite Star Indicator (Top Right)
+                // Favorite Star Indicator (Top Right)
                 if (widget.channel.isFavorite)
                   Positioned(
                     top: 10,
@@ -300,14 +352,14 @@ class _TVChannelCardState extends State<TVChannelCard> {
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: Colors.black54,
+                        color: Colors.black.withOpacity(0.65),
                         shape: BoxShape.circle,
                         border: Border.all(color: TVTheme.gold.withOpacity(0.5), width: 1),
                       ),
                       child: const Icon(
                         Icons.star_rounded,
                         color: TVTheme.gold,
-                        size: 16,
+                        size: 15,
                       ),
                     ),
                   ),

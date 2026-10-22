@@ -152,23 +152,26 @@ class _TVQuickGuideState extends State<TVQuickGuide> {
       child: Container(
         width: 390,
         decoration: BoxDecoration(
-          color: const Color(0xF00F172A),
-          border: const Border(left: BorderSide(color: Colors.white12, width: 1)),
+          color: const Color(0xF5111216),
+          border: Border(left: BorderSide(color: Colors.white.withOpacity(0.08), width: 1)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.6),
-              blurRadius: 20,
-              offset: const Offset(-5, 0),
+              color: Colors.black.withOpacity(0.75),
+              blurRadius: 26,
+              offset: const Offset(-8, 0),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Guide Header
+            // Guide Header (Free-My-TV Drawer Header)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              color: Colors.black38,
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.35),
+                border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.06))),
+              ),
               child: Row(
                 children: [
                   const Icon(Icons.list_alt_rounded, color: TVTheme.focusColor, size: 22),
@@ -178,15 +181,16 @@ class _TVQuickGuideState extends State<TVQuickGuide> {
                     style: TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: TVTheme.textPrimary,
                     ),
                   ),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.08),
+                      color: Colors.white.withOpacity(0.06),
                       borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.white.withOpacity(0.08)),
                     ),
                     child: Text(
                       '${widget.playlist.length} CH',
@@ -226,24 +230,34 @@ class _TVQuickGuideState extends State<TVQuickGuide> {
                       });
                       widget.onChannelSelected(ch);
                     },
-                    child: Container(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 140),
                       margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: isFocused
                             ? TVTheme.focusColor
                             : isCurrent
-                                ? TVTheme.cardFocusBackground
+                                ? const Color(0xFF23252E)
                                 : Colors.transparent,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: isFocused
                               ? Colors.white
                               : isCurrent
-                                  ? TVTheme.focusColor
+                                  ? TVTheme.focusColor.withOpacity(0.7)
                                   : Colors.transparent,
                           width: isFocused ? 2 : 1,
                         ),
+                        boxShadow: isFocused
+                            ? [
+                                BoxShadow(
+                                  color: TVTheme.focusColor.withOpacity(0.35),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 2),
+                                )
+                              ]
+                            : null,
                       ),
                       child: Row(
                         children: [

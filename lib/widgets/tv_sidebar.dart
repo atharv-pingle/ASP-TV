@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import '../models/language.dart';
 import '../theme/tv_theme.dart';
 
+/// Free-My-TV inspired dark launcher sidebar:
+/// Deep frosted charcoal rail, glassmorphic category pills,
+/// emerald LIVE branding, and smooth high-contrast remote focus rings.
 class TVSidebar extends StatefulWidget {
   final List<LanguageCategory> categories;
   final String selectedCategory;
@@ -22,14 +25,34 @@ class TVSidebar extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<TVSidebar> createState() => _TVSidebarState();
+  State<TVSidebar> createState() => TVSidebarState();
 }
 
-class _TVSidebarState extends State<TVSidebar> {
+class TVSidebarState extends State<TVSidebar> {
   final Map<String, FocusNode> _nodes = {};
 
-  FocusNode _getNode(String key) {
+  FocusNode getNode(String key) {
     return _nodes.putIfAbsent(key, () => FocusNode(debugLabel: key));
+  }
+
+  /// Whether any navigation element in the sidebar currently holds input focus
+  bool hasSidebarFocus() {
+    return _nodes.values.any((node) => node.hasFocus);
+  }
+
+  /// Request focus on the currently selected active item (sub-genre or category)
+  void focusActive() {
+    if (widget.selectedGenre != 'all') {
+      final genreKey = 'genre_${widget.selectedCategory}_${widget.selectedGenre}';
+      if (_nodes.containsKey(genreKey)) {
+        _nodes[genreKey]!.requestFocus();
+        return;
+      }
+    }
+    final catKey = 'cat_${widget.selectedCategory}';
+    if (_nodes.containsKey(catKey)) {
+      _nodes[catKey]!.requestFocus();
+    }
   }
 
   @override
@@ -43,62 +66,90 @@ class _TVSidebarState extends State<TVSidebar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 230,
-      color: TVTheme.sidebarBackground,
+      width: 240,
+      decoration: BoxDecoration(
+        color: TVTheme.sidebarBackground,
+        border: Border(
+          right: BorderSide(
+            color: Colors.white.withOpacity(0.06),
+            width: 1.0,
+          ),
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ASP TV Brand Header
+          // Launcher Brand Header (Free-My-TV inspired)
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 26, 20, 18),
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 18),
             child: Row(
               children: [
                 Container(
-                  width: 38,
-                  height: 38,
+                  width: 42,
+                  height: 42,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [Color(0xFF0284C7), Color(0xFF38BDF8)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: TVTheme.focusColor.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
+                        color: TVTheme.focusColor.withOpacity(0.35),
+                        blurRadius: 14,
+                        offset: const Offset(0, 4),
                       )
                     ],
                   ),
                   child: const Center(
                     child: Icon(
-                      Icons.live_tv_rounded,
+                      Icons.tv_rounded,
                       color: Colors.white,
-                      size: 22,
+                      size: 24,
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'ASP TV',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
                         color: Colors.white,
-                        letterSpacing: 1.0,
+                        letterSpacing: 1.2,
                       ),
                     ),
-                    Text(
-                      'Live Television',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: TVTheme.focusColor,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    Row(
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: TVTheme.liveGreen,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: TVTheme.liveGreen.withOpacity(0.8),
+                                blurRadius: 6,
+                                spreadRadius: 1,
+                              )
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        const Text(
+                          'Live TV Launcher',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: TVTheme.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -123,20 +174,20 @@ class _TVSidebarState extends State<TVSidebar> {
             ),
           ),
 
-          // Remote Hint
+          // Remote Control Navigation Hint Bar
           const Divider(color: Colors.white10, height: 1),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                Icon(Icons.touch_app_outlined, size: 14, color: TVTheme.textMuted),
-                SizedBox(width: 8),
+                Icon(Icons.gamepad_rounded, size: 14, color: TVTheme.textMuted.withOpacity(0.8)),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'D-Pad to Move • OK to Open',
+                    'D-Pad Navigate • OK Select',
                     style: TextStyle(
                       fontSize: 11,
-                      color: TVTheme.textMuted,
+                      color: TVTheme.textMuted.withOpacity(0.8),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -156,13 +207,13 @@ class _TVSidebarState extends State<TVSidebar> {
     final hasGenres = cat.genres.isNotEmpty;
     final isExpanded = isLangSelected && hasGenres;
 
-    final catNode = _getNode('cat_${cat.code}');
+    final catNode = getNode('cat_${cat.code}');
 
     // Target for down from category: first genre if expanded, or next category
     VoidCallback? onDown;
     if (isExpanded) {
       onDown = () {
-        final firstGenreNode = _getNode('genre_${cat.code}_${cat.genres.first.code}');
+        final firstGenreNode = getNode('genre_${cat.code}_${cat.genres.first.code}');
         firstGenreNode.requestFocus();
       };
     }
@@ -191,17 +242,17 @@ class _TVSidebarState extends State<TVSidebar> {
   Widget _buildGenreItem(LanguageCategory cat, int catIndex, int genreIndex) {
     final genre = cat.genres[genreIndex];
     final isSelected = widget.selectedGenre == genre.code;
-    final genreNode = _getNode('genre_${cat.code}_${genre.code}');
+    final genreNode = getNode('genre_${cat.code}_${genre.code}');
 
     // If first genre, arrowUp goes to parent category
     VoidCallback? onUp;
     if (genreIndex == 0) {
       onUp = () {
-        _getNode('cat_${cat.code}').requestFocus();
+        getNode('cat_${cat.code}').requestFocus();
       };
     } else {
       onUp = () {
-        _getNode('genre_${cat.code}_${cat.genres[genreIndex - 1].code}').requestFocus();
+        getNode('genre_${cat.code}_${cat.genres[genreIndex - 1].code}').requestFocus();
       };
     }
 
@@ -211,12 +262,12 @@ class _TVSidebarState extends State<TVSidebar> {
       if (catIndex + 1 < widget.categories.length) {
         onDown = () {
           final nextCat = widget.categories[catIndex + 1];
-          _getNode('cat_${nextCat.code}').requestFocus();
+          getNode('cat_${nextCat.code}').requestFocus();
         };
       }
     } else {
       onDown = () {
-        _getNode('genre_${cat.code}_${cat.genres[genreIndex + 1].code}').requestFocus();
+        getNode('genre_${cat.code}_${cat.genres[genreIndex + 1].code}').requestFocus();
       };
     }
 
@@ -302,85 +353,91 @@ class _TVSidebarItemState extends State<_TVSidebarItem> {
       },
       child: GestureDetector(
         onTap: widget.onSelect,
-        child: AnimatedContainer(
+        child: AnimatedScale(
+          scale: _isFocused ? 1.03 : 1.0,
           duration: const Duration(milliseconds: 150),
-          margin: const EdgeInsets.symmetric(vertical: 3),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          decoration: BoxDecoration(
-            color: _isFocused
-                ? TVTheme.focusColor
-                : active
-                    ? TVTheme.cardFocusBackground
-                    : Colors.transparent,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            margin: const EdgeInsets.symmetric(vertical: 3),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              // Free-My-TV dark theme pill
               color: _isFocused
-                  ? Colors.white
+                  ? TVTheme.focusColor
                   : active
-                      ? TVTheme.focusColor.withOpacity(0.6)
-                      : Colors.transparent,
-              width: _isFocused ? 2 : 1,
-            ),
-            boxShadow: _isFocused
-                ? [
-                    BoxShadow(
-                      color: TVTheme.focusColor.withOpacity(0.4),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    )
-                  ]
-                : null,
-          ),
-          child: Row(
-            children: [
-              Text(
-                widget.category.icon,
-                style: const TextStyle(fontSize: 17),
+                      ? const Color(0xFF23252E)
+                      : Colors.white.withOpacity(0.03),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: _isFocused
+                    ? Colors.white
+                    : active
+                        ? Colors.white.withOpacity(0.2)
+                        : Colors.white.withOpacity(0.04),
+                width: _isFocused ? 2 : 1,
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  widget.category.name,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: _isFocused || active
-                        ? FontWeight.bold
-                        : FontWeight.w500,
-                    color: _isFocused
-                        ? Colors.black87
-                        : active
-                            ? Colors.white
-                            : TVTheme.textSecondary,
+              boxShadow: _isFocused
+                  ? [
+                      BoxShadow(
+                        color: TVTheme.focusColor.withOpacity(0.4),
+                        blurRadius: 14,
+                        offset: const Offset(0, 3),
+                      )
+                    ]
+                  : null,
+            ),
+            child: Row(
+              children: [
+                Text(
+                  widget.category.icon,
+                  style: const TextStyle(fontSize: 17),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    widget.category.name,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: _isFocused || active
+                          ? FontWeight.bold
+                          : FontWeight.w500,
+                      color: _isFocused
+                          ? Colors.black87
+                          : active
+                              ? Colors.white
+                              : TVTheme.textPrimary,
+                    ),
                   ),
                 ),
-              ),
-              if (widget.category.genres.isNotEmpty)
-                Icon(
-                  widget.isExpanded
-                      ? Icons.keyboard_arrow_down_rounded
-                      : Icons.keyboard_arrow_right_rounded,
-                  size: 16,
-                  color: _isFocused ? Colors.black87 : TVTheme.textMuted,
-                ),
-              const SizedBox(width: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: _isFocused
-                      ? Colors.black26
-                      : Colors.white.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  '${widget.category.count}',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
+                if (widget.category.genres.isNotEmpty)
+                  Icon(
+                    widget.isExpanded
+                        ? Icons.keyboard_arrow_down_rounded
+                        : Icons.keyboard_arrow_right_rounded,
+                    size: 16,
                     color: _isFocused ? Colors.black87 : TVTheme.textMuted,
                   ),
+                const SizedBox(width: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: _isFocused
+                        ? Colors.black26
+                        : Colors.white.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '${widget.category.count}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: _isFocused ? Colors.black87 : TVTheme.textMuted,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -461,67 +518,81 @@ class _TVGenreItemState extends State<_TVGenreItem> {
       },
       child: GestureDetector(
         onTap: widget.onSelect,
-        child: AnimatedContainer(
+        child: AnimatedScale(
+          scale: _isFocused ? 1.03 : 1.0,
           duration: const Duration(milliseconds: 150),
-          margin: const EdgeInsets.only(left: 20, right: 4, top: 2, bottom: 2),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-          decoration: BoxDecoration(
-            color: _isFocused
-                ? TVTheme.focusColor
-                : active
-                    ? TVTheme.cardFocusBackground
-                    : Colors.white.withOpacity(0.04),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            margin: const EdgeInsets.only(left: 20, right: 4, top: 2, bottom: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
               color: _isFocused
-                  ? Colors.white
+                  ? TVTheme.focusColor
                   : active
-                      ? TVTheme.focusColor
-                      : Colors.transparent,
-              width: _isFocused ? 2 : 1,
+                      ? const Color(0xFF262832)
+                      : Colors.white.withOpacity(0.03),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: _isFocused
+                    ? Colors.white
+                    : active
+                        ? Colors.white.withOpacity(0.2)
+                        : Colors.transparent,
+                width: _isFocused ? 2 : 1,
+              ),
+              boxShadow: _isFocused
+                  ? [
+                      BoxShadow(
+                        color: TVTheme.focusColor.withOpacity(0.35),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      )
+                    ]
+                  : null,
             ),
-          ),
-          child: Row(
-            children: [
-              Text(
-                widget.genre.icon,
-                style: const TextStyle(fontSize: 13),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  widget.genre.name,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: _isFocused || active
-                        ? FontWeight.bold
-                        : FontWeight.w500,
+            child: Row(
+              children: [
+                Text(
+                  widget.genre.icon,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    widget.genre.name,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: _isFocused || active
+                          ? FontWeight.bold
+                          : FontWeight.w500,
+                      color: _isFocused
+                          ? Colors.black87
+                          : active
+                              ? Colors.white
+                              : TVTheme.textPrimary,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  decoration: BoxDecoration(
                     color: _isFocused
-                        ? Colors.black87
-                        : active
-                            ? Colors.white
-                            : TVTheme.textSecondary,
+                        ? Colors.black26
+                        : Colors.white.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${widget.genre.count}',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: _isFocused ? Colors.black87 : TVTheme.textMuted,
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                decoration: BoxDecoration(
-                  color: _isFocused
-                      ? Colors.black26
-                      : Colors.white.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '${widget.genre.count}',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: _isFocused ? Colors.black87 : TVTheme.textMuted,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
