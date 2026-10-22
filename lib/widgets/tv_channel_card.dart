@@ -259,27 +259,27 @@ class _TVChannelCardState extends State<TVChannelCard> {
             child: Stack(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
                   child: Column(
                     children: [
-                      // Elevated Clean Logo Stage
+                      // Elevated Clean Logo Stage - Maximized for visibility on TV
                       Expanded(
                         child: Container(
                           width: double.infinity,
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.2),
+                            color: Colors.black.withOpacity(0.25),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.white.withOpacity(0.04)),
                           ),
                           child: Center(
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                               child: _buildLogo(),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 8),
 
                       // Channel Name Text
                       Text(

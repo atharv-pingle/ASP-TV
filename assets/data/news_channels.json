@@ -126,6 +126,19 @@
     "category": "news"
   },
   {
+    "id": "SaamTV.in",
+    "name": "Saam TV",
+    "language_code": "mar",
+    "language_name": "Marathi",
+    "network": "Sakal Media",
+    "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_SAAM_TV/images/LOGO_HD/image.png",
+    "streams": [
+      "https://streams.tangotv.in/SAAMTV/ORIGIN/index.m3u8",
+      "https://cdn.pishow.tv/ott/live/437/master.m3u8"
+    ],
+    "category": "news"
+  },
+  {
     "id": "22ScopeNews.in",
     "name": "22Scope News",
     "language_code": "hin",
@@ -2421,18 +2434,6 @@
       "https://d3qs3d2rkhfqrt.cloudfront.net/out/v1/66dcc3ebe182447ba42837e746cf0c7c/index.m3u8"
     ],
     "category": "entertainment"
-  },
-  {
-    "id": "SaamTV.in",
-    "name": "Saam TV",
-    "language_code": "mar",
-    "language_name": "Marathi",
-    "network": "Sakal Media",
-    "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_SAAM_TV/images/LOGO_HD/image.png",
-    "streams": [
-      "https://cdn.pishow.tv/ott/live/437/master.m3u8"
-    ],
-    "category": "news"
   },
   {
     "id": "ZeeTV.in",

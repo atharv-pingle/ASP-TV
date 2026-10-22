@@ -573,11 +573,11 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                             )
                           else
                             SliverPadding(
-                              padding: const EdgeInsets.fromLTRB(24, 0, 24, 28),
+                              padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
                               sliver: SliverGrid(
                                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 4,
-                                  childAspectRatio: 1.25,
+                                  childAspectRatio: 1.08,
                                   crossAxisSpacing: 18,
                                   mainAxisSpacing: 18,
                                 ),
@@ -667,11 +667,11 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                             )
                           else
                             SliverPadding(
-                              padding: const EdgeInsets.fromLTRB(24, 0, 24, 28),
+                              padding: const EdgeInsets.fromLTRB(24, 8, 24, 28),
                               sliver: SliverGrid(
                                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 4,
-                                  childAspectRatio: 1.25,
+                                  childAspectRatio: 1.08,
                                   crossAxisSpacing: 18,
                                   mainAxisSpacing: 18,
                                 ),
@@ -721,11 +721,11 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                             )
                           else
                             SliverPadding(
-                              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                              padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
                               sliver: SliverGrid(
                                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 4, // 4-column TV grid
-                                  childAspectRatio: 1.25,
+                                  childAspectRatio: 1.08,
                                   crossAxisSpacing: 18,
                                   mainAxisSpacing: 18,
                                 ),
