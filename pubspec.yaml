@@ -1,7 +1,7 @@
 name: asp_tv
 description: "ASP TV - Live Television, Entertainment, Movies, Kids & Infotainment for Android TV"
 publish_to: 'none'
-version: 1.0.11+12
+version: 1.0.12+13
 
 environment:
   sdk: '>=3.2.0 <4.0.0'

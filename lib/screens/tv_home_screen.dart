@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/channel.dart';
+import '../models/language.dart';
 import '../services/channel_service.dart';
 import '../theme/tv_theme.dart';
 import '../widgets/tv_channel_card.dart';
