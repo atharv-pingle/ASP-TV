@@ -16,6 +16,7 @@ class TVChannelCard extends StatefulWidget {
   final bool autoFocus;
   final FocusNode? focusNode;
   final VoidCallback? onLeftToSidebar;
+  final VoidCallback? onUpToSearch;
 
   const TVChannelCard({
     Key? key,
@@ -25,6 +26,7 @@ class TVChannelCard extends StatefulWidget {
     this.autoFocus = false,
     this.focusNode,
     this.onLeftToSidebar,
+    this.onUpToSearch,
   }) : super(key: key);
 
   @override
@@ -220,6 +222,10 @@ class _TVChannelCardState extends State<TVChannelCard> {
           final key = event.logicalKey;
           if (key == LogicalKeyboardKey.arrowLeft && widget.onLeftToSidebar != null) {
             widget.onLeftToSidebar!();
+            return KeyEventResult.handled;
+          }
+          if (key == LogicalKeyboardKey.arrowUp && widget.onUpToSearch != null) {
+            widget.onUpToSearch!();
             return KeyEventResult.handled;
           }
           if (_isSelectKey(key)) {

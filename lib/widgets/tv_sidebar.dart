@@ -173,28 +173,6 @@ class TVSidebarState extends State<TVSidebar> {
               ),
             ),
           ),
-
-          // Remote Control Navigation Hint Bar
-          const Divider(color: Colors.white10, height: 1),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Icon(Icons.gamepad_rounded, size: 14, color: TVTheme.textMuted.withOpacity(0.8)),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'D-Pad Navigate • OK Select',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: TVTheme.textMuted.withOpacity(0.8),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );

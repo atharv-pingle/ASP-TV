@@ -22,9 +22,10 @@ class TVHomeScreen extends StatefulWidget {
 class _TVHomeScreenState extends State<TVHomeScreen> {
   final GlobalKey<TVSidebarState> _sidebarKey = GlobalKey<TVSidebarState>();
   final TextEditingController _searchController = TextEditingController();
-  final FocusNode _searchFocusNode = FocusNode();
-  final FocusNode _searchBarContainerFocusNode = FocusNode();
+  final FocusNode _searchFocusNode = FocusNode(skipTraversal: true, debugLabel: 'SearchInput');
+  final FocusNode _searchBarContainerFocusNode = FocusNode(skipTraversal: true, debugLabel: 'SearchBarContainer');
   final FocusNode _firstCardFocusNode = FocusNode(debugLabel: 'FirstCardFocusNode');
+  final ScrollController _scrollController = ScrollController();
   bool _isSearchEditing = false;
   bool _isSearchContainerFocused = false;
   DateTime? _lastBackPressTime;
@@ -60,6 +61,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
   @override
   void dispose() {
     _clockTimer?.cancel();
+    _scrollController.dispose();
     _searchController.dispose();
     _searchFocusNode.dispose();
     _searchBarContainerFocusNode.dispose();
@@ -241,12 +243,19 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                   }
 
                   if (key == LogicalKeyboardKey.arrowDown) {
+                    if (_scrollController.hasClients && _scrollController.offset > 0) {
+                      _scrollController.animateTo(
+                        0,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeOutCubic,
+                      );
+                    }
                     _firstCardFocusNode.requestFocus();
                     return KeyEventResult.handled;
                   }
 
                   if (key == LogicalKeyboardKey.arrowLeft) {
-                    FocusScope.of(context).previousFocus();
+                    _sidebarKey.currentState?.focusActive();
                     return KeyEventResult.handled;
                   }
 
@@ -514,6 +523,8 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                     right: 0,
                     bottom: 0,
                     child: CustomScrollView(
+                      controller: _scrollController,
+                      cacheExtent: 1500,
                       clipBehavior: Clip.hardEdge,
                       slivers: [
                         if (service.selectedLanguage == 'fav' && service.searchQuery.isEmpty) ...[
@@ -599,6 +610,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                       autoFocus: index == 0,
                                       focusNode: index == 0 ? _firstCardFocusNode : null,
                                       onLeftToSidebar: index % 4 == 0 ? () => _sidebarKey.currentState?.focusActive() : null,
+                                      onUpToSearch: index < 4 ? () => _searchBarContainerFocusNode.requestFocus() : null,
                                       onSelect: () => _openPlayer(channel, service.favoriteChannels),
                                       onToggleFavorite: () => service.toggleFavorite(channel),
                                     );
@@ -691,6 +703,9 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                           ? _firstCardFocusNode
                                           : null,
                                       onLeftToSidebar: index % 4 == 0 ? () => _sidebarKey.currentState?.focusActive() : null,
+                                      onUpToSearch: (service.favoriteChannels.isEmpty && index < 4)
+                                          ? () => _searchBarContainerFocusNode.requestFocus()
+                                          : null,
                                       onSelect: () => _openPlayer(channel, recents),
                                       onToggleFavorite: () => service.toggleFavorite(channel),
                                     );
@@ -741,6 +756,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                       autoFocus: index == 0,
                                       focusNode: index == 0 ? _firstCardFocusNode : null,
                                       onLeftToSidebar: index % 4 == 0 ? () => _sidebarKey.currentState?.focusActive() : null,
+                                      onUpToSearch: index < 4 ? () => _searchBarContainerFocusNode.requestFocus() : null,
                                       onSelect: () => _openPlayer(channel, channels),
                                       onToggleFavorite: () => service.toggleFavorite(channel),
                                     );
