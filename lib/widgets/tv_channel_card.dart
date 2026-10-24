@@ -15,6 +15,7 @@ class TVChannelCard extends StatefulWidget {
   final VoidCallback onToggleFavorite;
   final bool autoFocus;
   final FocusNode? focusNode;
+  final VoidCallback? onLeftToSidebar;
 
   const TVChannelCard({
     Key? key,
@@ -23,6 +24,7 @@ class TVChannelCard extends StatefulWidget {
     required this.onToggleFavorite,
     this.autoFocus = false,
     this.focusNode,
+    this.onLeftToSidebar,
   }) : super(key: key);
 
   @override
@@ -30,13 +32,34 @@ class TVChannelCard extends StatefulWidget {
 }
 
 class _TVChannelCardState extends State<TVChannelCard> {
+  late final FocusNode _effectiveFocusNode;
   bool _isFocused = false;
   Timer? _longPressTimer;
   bool _longPressTriggered = false;
+  bool _isSelectKeyDown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _effectiveFocusNode = widget.focusNode ?? FocusNode(debugLabel: 'Card_${widget.channel.id}');
+    _effectiveFocusNode.addListener(_handleFocusChange);
+  }
+
+  void _handleFocusChange() {
+    if (mounted && _isFocused != _effectiveFocusNode.hasFocus) {
+      setState(() {
+        _isFocused = _effectiveFocusNode.hasFocus;
+      });
+    }
+  }
 
   @override
   void dispose() {
     _longPressTimer?.cancel();
+    _effectiveFocusNode.removeListener(_handleFocusChange);
+    if (widget.focusNode == null) {
+      _effectiveFocusNode.dispose();
+    }
     super.dispose();
   }
 
@@ -54,20 +77,23 @@ class _TVChannelCardState extends State<TVChannelCard> {
 
   void _onKeyDown(LogicalKeyboardKey key) {
     if (!_isSelectKey(key)) return;
-    if (_longPressTimer != null && _longPressTimer!.isActive) return;
-
+    if (_isSelectKeyDown) return;
+    _isSelectKeyDown = true;
     _longPressTriggered = false;
+    _longPressTimer?.cancel();
     // 600ms hold triggers favorite toggle via remote
     _longPressTimer = Timer(const Duration(milliseconds: 600), () {
-      _longPressTriggered = true;
-      widget.onToggleFavorite();
-      _showFavoriteFeedback();
+      if (mounted) {
+        _longPressTriggered = true;
+        widget.onToggleFavorite();
+        _showFavoriteFeedback();
+      }
     });
   }
 
   void _onKeyUp(LogicalKeyboardKey key) {
     if (!_isSelectKey(key)) return;
-
+    _isSelectKeyDown = false;
     if (_longPressTimer != null && _longPressTimer!.isActive) {
       _longPressTimer!.cancel();
     }
@@ -187,22 +213,23 @@ class _TVChannelCardState extends State<TVChannelCard> {
   @override
   Widget build(BuildContext context) {
     return Focus(
-      focusNode: widget.focusNode,
+      focusNode: _effectiveFocusNode,
       autofocus: widget.autoFocus,
-      onFocusChange: (focused) {
-        setState(() {
-          _isFocused = focused;
-        });
-      },
       onKeyEvent: (node, event) {
         if (event is KeyDownEvent) {
-          if (_isSelectKey(event.logicalKey)) {
-            _onKeyDown(event.logicalKey);
+          final key = event.logicalKey;
+          if (key == LogicalKeyboardKey.arrowLeft && widget.onLeftToSidebar != null) {
+            widget.onLeftToSidebar!();
+            return KeyEventResult.handled;
+          }
+          if (_isSelectKey(key)) {
+            _onKeyDown(key);
             return KeyEventResult.handled;
           }
         } else if (event is KeyUpEvent) {
-          if (_isSelectKey(event.logicalKey)) {
-            _onKeyUp(event.logicalKey);
+          final key = event.logicalKey;
+          if (_isSelectKey(key)) {
+            _onKeyUp(key);
             return KeyEventResult.handled;
           }
         }
@@ -215,11 +242,12 @@ class _TVChannelCardState extends State<TVChannelCard> {
           _showFavoriteFeedback();
         },
         child: AnimatedScale(
-          scale: _isFocused ? 1.08 : 1.0,
-          duration: const Duration(milliseconds: 180),
+          scale: _isFocused ? 1.04 : 1.0,
+          duration: const Duration(milliseconds: 160),
           curve: Curves.easeOutCubic,
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
+            duration: const Duration(milliseconds: 160),
+            margin: EdgeInsets.all(_isFocused ? 0 : 3),
             decoration: BoxDecoration(
               // Free-My-TV dark launcher card styling
               gradient: LinearGradient(
@@ -238,21 +266,21 @@ class _TVChannelCardState extends State<TVChannelCard> {
                   ? [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.65),
-                        blurRadius: 26,
-                        spreadRadius: 2,
-                        offset: const Offset(0, 8),
+                        blurRadius: 20,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 6),
                       ),
                       BoxShadow(
                         color: TVTheme.focusColor.withOpacity(0.35),
-                        blurRadius: 18,
+                        blurRadius: 14,
                         spreadRadius: 1,
                       )
                     ]
                   : [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
+                        color: Colors.black.withOpacity(0.25),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
                       )
                     ],
             ),
