@@ -507,20 +507,20 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
             Expanded(
               child: Stack(
                 children: [
-                  // 1. Content Area (Rendered first, scrolls smoothly behind the fixed header)
-                  Positioned.fill(
+                  // 1. Content Area (Rendered first, positioned strictly below the fixed header)
+                  Positioned(
+                    top: 68,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
                     child: CustomScrollView(
                       clipBehavior: Clip.hardEdge,
                       slivers: [
-                        // Space for fixed header (68px) + breathing clearance (16px) = 84px total
-                        const SliverToBoxAdapter(
-                          child: SizedBox(height: 84),
-                        ),
                         if (service.selectedLanguage == 'fav' && service.searchQuery.isEmpty) ...[
                           // SECTION 1: Favorite Channels Header
                           SliverToBoxAdapter(
                             child: Padding(
-                              padding: const EdgeInsets.fromLTRB(24, 6, 24, 12),
+                              padding: const EdgeInsets.fromLTRB(24, 18, 24, 12),
                               child: Row(
                                 children: [
                                   const Icon(Icons.star_rounded, size: 20, color: Color(0xFFF59E0B)),
