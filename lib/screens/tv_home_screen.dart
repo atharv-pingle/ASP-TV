@@ -58,6 +58,16 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
     }
   }
 
+  void _scrollToTop() {
+    if (_scrollController.hasClients && _scrollController.offset > 0) {
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
   @override
   void dispose() {
     _clockTimer?.cancel();
@@ -243,13 +253,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                   }
 
                   if (key == LogicalKeyboardKey.arrowDown) {
-                    if (_scrollController.hasClients && _scrollController.offset > 0) {
-                      _scrollController.animateTo(
-                        0,
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeOutCubic,
-                      );
-                    }
+                    _scrollToTop();
                     _firstCardFocusNode.requestFocus();
                     return KeyEventResult.handled;
                   }
@@ -518,7 +522,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                 children: [
                   // 1. Content Area (Rendered first, positioned strictly below the fixed header)
                   Positioned(
-                    top: 68,
+                    top: 82,
                     left: 0,
                     right: 0,
                     bottom: 0,
@@ -611,6 +615,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                       focusNode: index == 0 ? _firstCardFocusNode : null,
                                       onLeftToSidebar: index % 4 == 0 ? () => _sidebarKey.currentState?.focusActive() : null,
                                       onUpToSearch: index < 4 ? () => _searchBarContainerFocusNode.requestFocus() : null,
+                                      onFocused: index < 4 ? _scrollToTop : null,
                                       onSelect: () => _openPlayer(channel, service.favoriteChannels),
                                       onToggleFavorite: () => service.toggleFavorite(channel),
                                     );
@@ -706,6 +711,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                       onUpToSearch: (service.favoriteChannels.isEmpty && index < 4)
                                           ? () => _searchBarContainerFocusNode.requestFocus()
                                           : null,
+                                      onFocused: (service.favoriteChannels.isEmpty && index < 4) ? _scrollToTop : null,
                                       onSelect: () => _openPlayer(channel, recents),
                                       onToggleFavorite: () => service.toggleFavorite(channel),
                                     );
@@ -740,7 +746,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                             )
                           else
                             SliverPadding(
-                              padding: const EdgeInsets.fromLTRB(24, 18, 24, 32),
+                              padding: const EdgeInsets.fromLTRB(24, 6, 24, 32),
                               sliver: SliverGrid(
                                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount: 4, // 4-column TV grid
@@ -757,6 +763,7 @@ class _TVHomeScreenState extends State<TVHomeScreen> {
                                       focusNode: index == 0 ? _firstCardFocusNode : null,
                                       onLeftToSidebar: index % 4 == 0 ? () => _sidebarKey.currentState?.focusActive() : null,
                                       onUpToSearch: index < 4 ? () => _searchBarContainerFocusNode.requestFocus() : null,
+                                      onFocused: index < 4 ? _scrollToTop : null,
                                       onSelect: () => _openPlayer(channel, channels),
                                       onToggleFavorite: () => service.toggleFavorite(channel),
                                     );

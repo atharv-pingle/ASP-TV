@@ -17,6 +17,7 @@ class TVChannelCard extends StatefulWidget {
   final FocusNode? focusNode;
   final VoidCallback? onLeftToSidebar;
   final VoidCallback? onUpToSearch;
+  final VoidCallback? onFocused;
 
   const TVChannelCard({
     Key? key,
@@ -27,6 +28,7 @@ class TVChannelCard extends StatefulWidget {
     this.focusNode,
     this.onLeftToSidebar,
     this.onUpToSearch,
+    this.onFocused,
   }) : super(key: key);
 
   @override
@@ -52,6 +54,9 @@ class _TVChannelCardState extends State<TVChannelCard> {
       setState(() {
         _isFocused = _effectiveFocusNode.hasFocus;
       });
+      if (_effectiveFocusNode.hasFocus && widget.onFocused != null) {
+        widget.onFocused!();
+      }
     }
   }
 
