@@ -103,15 +103,16 @@ class ChannelService with ChangeNotifier {
           }
         }
 
-        // Apply any fresh streams to active channels
+        // Append any fresh streams as fallbacks to active channels without overwriting curated primary
         bool hasUpdates = false;
         for (var ch in _allChannels) {
           if (freshStreams.containsKey(ch.id)) {
             final fresh = freshStreams[ch.id]!;
-            if (fresh.isNotEmpty && fresh.first != ch.primaryStream) {
-              ch.streams.clear();
-              ch.streams.addAll(fresh);
-              hasUpdates = true;
+            for (final s in fresh) {
+              if (!ch.streams.contains(s)) {
+                ch.streams.add(s);
+                hasUpdates = true;
+              }
             }
           }
         }

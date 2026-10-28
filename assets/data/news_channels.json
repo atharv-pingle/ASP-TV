@@ -170,11 +170,7 @@
     "network": "ABP",
     "logo": "https://dtil.tmsimg.com/assets/s158138_ld_h15_aa.png?lock=720x540",
     "streams": [
-      "https://d1rc86nwwc9fag.cloudfront.net/vglive-sk-472500/abpnews/master.m3u8",
-      "https://d2l4ar6y3mrs4k.cloudfront.net/live-streaming/abpnews-livetv/master.m3u8",
-      "https://mumt04.tangotv.in/m18aqlK4ABPNEWS/index.m3u8",
-      "https://mumbai-edge.smartplaytv.in/ABPNews/index.m3u8",
-      "https://cdn.pishow.tv/ott/live/1057/master.m3u8"
+      "https://d1rc86nwwc9fag.cloudfront.net/vglive-sk-472500/abpnews/master.m3u8"
     ],
     "category": "news"
   },
@@ -225,12 +221,9 @@
     "network": "India Today Group",
     "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_AAJ_TAK/images/LOGO_HD/image.png",
     "streams": [
-      "http://103.213.31.109:90/AajtakHD/playlist.m3u8",
-      "https://d1rc86nwwc9fag.cloudfront.net/vglive-sk-791258/master.m3u8",
-      "https://feeds.intoday.in/aajtak/api/master.m3u8",
-      "https://aajtaklive-amd.akamaized.net/hls/live/2014416/aajtak/aajtaklive/live_404p/chunks.m3u8",
       "https://feeds.intoday.in/aajtak/api/aajtakhd/master.m3u8",
-      "https://livehub-voidnet.onrender.com/cluster/streamcore/in/AAJTAK_REDIS.m3u8"
+      "https://feeds.intoday.in/aajtak/api/master.m3u8",
+      "https://d1rc86nwwc9fag.cloudfront.net/vglive-sk-791258/master.m3u8"
     ],
     "category": "news"
   },
@@ -1386,6 +1379,7 @@
     "network": "India Today Group",
     "logo": "https://dtil.tmsimg.com/assets/s143197_ld_h15_aa.png?lock=720x540",
     "streams": [
+      "https://feeds.intoday.in/indiatoday/api/master.m3u8",
       "https://amg00644-amg00644c1-ondemandkorea-amesia-10266.playouts.now.amagi.tv/playlist/amg00644-tvtodaynetworkltdfast-indiatoday-ondemandkoreaamesia/playlist.m3u8",
       "https://indiatodaylive.akamaized.net/hls/live/2014320/indiatoday/indiatodaylive/playlist.m3u8",
       "https://d1rc86nwwc9fag.cloudfront.net/vglive-sk-293160/master.m3u8",
@@ -1558,7 +1552,7 @@
     "network": "Zee Media",
     "logo": "https://dtil.tmsimg.com/assets/s144087_ld_h15_aa.png?lock=720x540",
     "streams": [
-      "http://vg-zeefta.akamaized.net/ptnr-yupptv/title-wion/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/20c3c0d9-0256-43fe-bca6-70fdd490b957/main.m3u8",
+      "https://vg-zeefta.akamaized.net/ptnr-yupptv/title-wion/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/20c3c0d9-0256-43fe-bca6-70fdd490b957/main.m3u8",
       "https://d7x8z4yuq42qn.cloudfront.net/index_7.m3u8",
       "https://d7x8z4yuq42qn.cloudfront.net/index_1.m3u8",
       "https://d7x8z4yuq42qn.cloudfront.net/index_2.m3u8",
@@ -1736,18 +1730,6 @@
     ]
   },
   {
-    "id": "SonyPal.in",
-    "name": "Sony Pal",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Culver Max",
-    "logo": "https://dtil.tmsimg.com/assets/s157973_ld_h15_aa.png?lock=720x540",
-    "category": "entertainment",
-    "streams": [
-      "http://59.103.38.46:8000/play/a0ac/index.m3u8"
-    ]
-  },
-  {
     "id": "SonySAB.in",
     "name": "Sony SAB",
     "language_code": "hin",
@@ -1756,8 +1738,7 @@
     "logo": "https://jiotvimages.cdn.jio.com/dare_images/images/channel/70954ffc9bae055e09e48393b47570ea.png",
     "category": "entertainment",
     "streams": [
-      "https://drk6xq0vhn.gpcdn.net/live/sub_hd_abr/index.m3u8",
-      "http://103.151.60.162:2122/play/a01q/index.m3u8?hls"
+      "https://drk6xq0vhn.gpcdn.net/live/sub_hd_abr/index.m3u8"
     ]
   },
   {
@@ -1769,8 +1750,6 @@
     "logo": "https://img10.hotstar.com/image/upload/f_auto/sources/r1/cms/prod/2384/1782291852384-h.jpg",
     "category": "entertainment",
     "streams": [
-      "http://66.102.126.10:8000/play/a008/index.m3u8",
-      "http://103.185.24.134:3001/Star-Plus/index.m3u8",
       "http://202.70.146.135:8000/play/a009/index.m3u8"
     ]
   },
@@ -1972,68 +1951,6 @@
     ]
   },
   {
-    "id": "Sonic.in",
-    "name": "Sonic Nickelodeon",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Viacom18",
-    "logo": "https://img10.hotstar.com/image/upload/f_auto/sources/r1/cms/prod/6294/1782290926294-h.jpg",
-    "category": "kids",
-    "streams": [
-      "http://103.185.24.134:3001/SONIC/index.m3u8",
-      "http://103.151.60.162:2122/play/a02v/index.m3u8?hls"
-    ]
-  },
-  {
-    "id": "HungamaTV.in",
-    "name": "Hungama TV",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Disney Star",
-    "logo": "https://dtil.tmsimg.com/assets/s143150_ld_h15_aa.png?lock=720x540",
-    "category": "kids",
-    "streams": [
-      "http://103.185.24.134:3001/HUNGAMA/index.m3u8",
-      "http://66.102.126.10:8000/play/a023/index.m3u8"
-    ]
-  },
-  {
-    "id": "SuperHungama.in",
-    "name": "Super Hungama",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Disney Star",
-    "logo": "https://plain-apac-prod-public.komododecks.com/202609/07/lNjbGo0Rcgz3vhfoyTN7/image.png",
-    "category": "kids",
-    "streams": [
-      "http://103.185.24.134:3001/SUPER-HUNGAMA/index.m3u8"
-    ]
-  },
-  {
-    "id": "SonyYay.in",
-    "name": "Sony YAY!",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Culver Max",
-    "logo": "https://dtil.tmsimg.com/assets/s159100_ld_h15_aa.png?lock=720x540",
-    "category": "kids",
-    "streams": [
-      "http://103.165.93.31:8095/sonyYay/index.m3u8"
-    ]
-  },
-  {
-    "id": "DisneyChannel.in",
-    "name": "Disney Channel",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Disney Star",
-    "logo": "https://img10.hotstar.com/image/upload/f_auto/sources/r1/cms/prod/1540/1785251571540-h.jpg",
-    "category": "kids",
-    "streams": [
-      "http://66.102.126.10:8000/play/a013/index.m3u8"
-    ]
-  },
-  {
     "id": "TheJungleBook.in",
     "name": "The Jungle Book",
     "language_code": "eng",
@@ -2133,18 +2050,6 @@
     ]
   },
   {
-    "id": "SonyBBCEarth.in",
-    "name": "Sony BBC Earth HD",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Culver Max / BBC",
-    "logo": "https://dtil.tmsimg.com/assets/s143800_ld_h15_aa.png?lock=720x540",
-    "category": "infotainment",
-    "streams": [
-      "http://103.185.24.134:3001/SONY-BBC/index.m3u8"
-    ]
-  },
-  {
     "id": "TLC.in",
     "name": "TLC HD",
     "language_code": "eng",
@@ -2168,7 +2073,6 @@
     "streams": [
       "https://amg00416-amg00416c9-samsung-in-4882.playouts.now.amagi.tv/playlist/amg00416-travelxp-travelxphd-samsungin/playlist.m3u8",
       "http://stream.mcquack.net/451/index.m3u8",
-      "http://103.151.60.162:2122/play/a01s/index.m3u8?hls",
       "https://deltatesttatasky.akamaized.net/out/i/968284.m3u8"
     ]
   },
@@ -2181,8 +2085,7 @@
     "logo": "https://dtil.tmsimg.com/assets/s143133_ld_h15_aa.png?lock=720x540",
     "category": "infotainment",
     "streams": [
-      "https://techtraveleat.in/stream.m3u8?id=historytv18eng",
-      "http://103.151.60.162:2122/play/a00y/index.m3u8?hls"
+      "https://techtraveleat.in/stream.m3u8?id=historytv18eng"
     ]
   },
   {
@@ -2239,30 +2142,6 @@
     ]
   },
   {
-    "id": "colors_infinity_hd",
-    "name": "Colors Infinity HD",
-    "language_code": "eng",
-    "language_name": "English",
-    "category": "entertainment",
-    "network": "Viacom18",
-    "logo": "https://dtil.tmsimg.com/assets/s151978_ld_h15_aa.png?lock=720x540",
-    "streams": [
-      "http://103.151.60.162:2122/play/a02r/index.m3u8?hls"
-    ]
-  },
-  {
-    "id": "star_world_hd",
-    "name": "Star World HD",
-    "language_code": "eng",
-    "language_name": "English",
-    "category": "entertainment",
-    "network": "Disney Star",
-    "logo": "https://dtil.tmsimg.com/assets/s143922_ld_h15_aa.png?lock=720x540",
-    "streams": [
-      "http://103.185.24.134:3001/Star-World/index.m3u8"
-    ]
-  },
-  {
     "id": "zee_cafe_hd",
     "name": "Zee Cafe HD",
     "language_code": "eng",
@@ -2285,43 +2164,6 @@
     "streams": [
       "http://15.204.246.24:8080/AXNHD/index.m3u8",
       "http://181.119.66.28:8081/AXN/index.m3u8"
-    ]
-  },
-  {
-    "id": "star_movies_hd",
-    "name": "Star Movies HD",
-    "language_code": "eng",
-    "language_name": "English",
-    "category": "movies",
-    "network": "Disney Star",
-    "logo": "https://dtil.tmsimg.com/assets/s143916_ld_h15_aa.png?lock=720x540",
-    "streams": [
-      "http://103.185.24.134:3001/Star-Movies/index.m3u8",
-      "http://103.151.60.162:2122/play/a02k/index.m3u8?hls"
-    ]
-  },
-  {
-    "id": "sony_pix_hd",
-    "name": "Sony Pix HD",
-    "language_code": "eng",
-    "language_name": "English",
-    "category": "movies",
-    "network": "Sony Pictures",
-    "logo": "https://dtil.tmsimg.com/assets/s143878_ld_h15_aa.png?lock=720x540",
-    "streams": [
-      "http://103.151.60.162:2122/play/a01d/index.m3u8?hls"
-    ]
-  },
-  {
-    "id": "movies_now_hd",
-    "name": "Movies Now HD",
-    "language_code": "eng",
-    "language_name": "English",
-    "category": "movies",
-    "network": "Times Network",
-    "logo": "https://dtil.tmsimg.com/assets/s143575_ld_h15_aa.png?lock=720x540",
-    "streams": [
-      "http://103.151.60.162:2122/play/a02w/index.m3u8?hls"
     ]
   },
   {
@@ -2443,7 +2285,6 @@
     "network": "Zee",
     "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ZEE_TV/images/LOGO_HD/LOGO_HD_image.png",
     "streams": [
-      "http://103.151.60.162:2122/play/a01u/index.m3u8?hls",
       "http://41.205.93.154/ZEE-TV/index.m3u8"
     ],
     "category": "entertainment"
@@ -2456,7 +2297,6 @@
     "network": "Sony",
     "logo": "https://dtil.tmsimg.com/assets/s157589_ld_h15_aa.png?lock=720x540",
     "streams": [
-      "http://103.151.60.162:2122/play/a015/index.m3u8?hls",
       "http://38.96.178.205/SONYHD/index.m3u8"
     ],
     "category": "entertainment"
@@ -2469,7 +2309,6 @@
     "network": "Zee",
     "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_SYMANDTV/images/LOGO_HD/LOGO_HD_image.png",
     "streams": [
-      "http://103.151.60.162:2122/play/a020/index.m3u8?hls",
       "http://202.70.146.135:8000/play/a06c/index.m3u8"
     ],
     "category": "entertainment"
@@ -2482,8 +2321,7 @@
     "network": "Viacom18",
     "logo": "https://i.imgur.com/M8uCJ0D.png",
     "streams": [
-      "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/sg/YuppTV/ColorsAPAC.m3u8",
-      "http://66.102.126.10:8000/play/a00a/index.m3u8"
+      "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/sg/YuppTV/ColorsAPAC.m3u8"
     ],
     "category": "entertainment"
   },
@@ -2574,18 +2412,6 @@
     "category": "entertainment"
   },
   {
-    "id": "SonySportsTen3Hindi.in",
-    "name": "Sony Sports Ten 3 Hindi",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Sony",
-    "logo": "https://dtil.tmsimg.com/assets/GNLZZGG0025TCMR.png?lock=720x540",
-    "streams": [
-      "http://103.151.60.162:2122/play/a01t/index.m3u8?hls"
-    ],
-    "category": "entertainment"
-  },
-  {
     "id": "ZeeCinema.in",
     "name": "Zee Cinema HD",
     "language_code": "hin",
@@ -2593,32 +2419,7 @@
     "network": "Zee",
     "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_ZEE_CINEMA/images/LOGO_HD/LOGO_HD_image.png",
     "streams": [
-      "https://d1g8wgjurz8via.cloudfront.net/bpk-tv/NGCHD/default/NGCHD.m3u8",
-      "http://103.151.60.162:2122/play/a024/index.m3u8?hls"
-    ],
-    "category": "movies"
-  },
-  {
-    "id": "StarGold.in",
-    "name": "Star Gold HD",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Star",
-    "logo": "https://i.imgur.com/xC460sj.png",
-    "streams": [
-      "http://103.185.24.134:3001/Star-Gold/index.m3u8"
-    ],
-    "category": "movies"
-  },
-  {
-    "id": "StarGold2.in",
-    "name": "Star Gold 2 HD",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Star",
-    "logo": "https://i.imgur.com/G0ZfzZr.png",
-    "streams": [
-      "http://103.151.60.162:2122/play/a01v/index.m3u8?hls"
+      "https://d1g8wgjurz8via.cloudfront.net/bpk-tv/NGCHD/default/NGCHD.m3u8"
     ],
     "category": "movies"
   },
@@ -2630,8 +2431,7 @@
     "network": "Sony",
     "logo": "https://dtil.tmsimg.com/assets/s157590_ld_h15_aa.png?lock=720x540",
     "streams": [
-      "http://dksmedia.tv/play/live.php?mac=00:1A:79:B6:60:3D&stream=156013&extension=ts&play_token=slNi06NyY0",
-      "http://103.185.24.134:3001/SonyMAX/index.m3u8"
+      "http://dksmedia.tv/play/live.php?mac=00:1A:79:B6:60:3D&stream=156013&extension=ts&play_token=slNi06NyY0"
     ],
     "category": "movies"
   },
@@ -2655,8 +2455,7 @@
     "network": "Viacom18",
     "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_COLORS_CINEPLEX/images/LOGO_HD/image.png",
     "streams": [
-      "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/gb/YuppTV/ColorsCineplexUK.m3u8",
-      "http://103.151.60.162:2122/play/a02s/index.m3u8?hls"
+      "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/gb/YuppTV/ColorsCineplexUK.m3u8"
     ],
     "category": "movies"
   },
@@ -2705,18 +2504,6 @@
     "logo": "https://dtil.tmsimg.com/assets/s142881_ld_h15_aa.png?lock=720x540",
     "streams": [
       "http://103.175.73.12:8080/live/51/51_0.m3u8"
-    ],
-    "category": "movies"
-  },
-  {
-    "id": "BflixMovies.in",
-    "name": "Bflix Movies",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Bflix",
-    "logo": "https://i.imgur.com/5CtiQ45.png",
-    "streams": [
-      "http://103.151.60.162:2122/play/a01e/index.m3u8?hls"
     ],
     "category": "movies"
   },
@@ -2837,6 +2624,8 @@
     "network": "9X Media",
     "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_9X_TASHAN/images/LOGO_HD/image.png",
     "streams": [
+      "https://cdn.pishow.tv/ott/live/1613/master.m3u8",
+      "https://mumt01.tangotv.in/O5aw8Zn39XTASHAN/index.m3u8",
       "https://amg01281-9xmediapvtltd-9xtashan-samsungin-xz1sd.amagi.tv/playlist/amg01281-9xmediapvtltd-9xtashan-samsungin/playlist.m3u8"
     ],
     "category": "music"
@@ -2890,66 +2679,6 @@
     "category": "music"
   },
   {
-    "id": "DisneyJunior.in",
-    "name": "Disney Junior",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Disney",
-    "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_DISNEY_JUNIOR/images/LOGO_HD/image.png",
-    "streams": [
-      "http://103.151.60.162:2122/play/a016/index.m3u8?hls"
-    ],
-    "category": "kids"
-  },
-  {
-    "id": "DisneyInternationalHD.in",
-    "name": "Disney International HD",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Disney",
-    "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_DISNEY_INTERNATIONAL_HD/images/LOGO_HD/image.png",
-    "streams": [
-      "http://103.151.60.162:2122/play/a018/index.m3u8?hls"
-    ],
-    "category": "kids"
-  },
-  {
-    "id": "Nickelodeon.in",
-    "name": "Nickelodeon India",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Viacom18",
-    "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NICK/images/LOGO_HD/image.png",
-    "streams": [
-      "http://103.185.24.134:3001/NICK/index.m3u8"
-    ],
-    "category": "kids"
-  },
-  {
-    "id": "NickJr.in",
-    "name": "Nick Jr.",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Viacom18",
-    "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NICK_JUNIOR/images/LOGO_HD/image.png",
-    "streams": [
-      "http://103.185.24.134:3001/NICK-JR/index.m3u8"
-    ],
-    "category": "kids"
-  },
-  {
-    "id": "ETVBalBharat.in",
-    "name": "ETV Bal Bharat",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "ETV",
-    "logo": "https://i.imgur.com/zsTxPV9.png",
-    "streams": [
-      "http://103.185.24.134:3001/ETV-BAL-BHARAT/index.m3u8"
-    ],
-    "category": "kids"
-  },
-  {
     "id": "AnimalPlanet.in",
     "name": "Animal Planet HD",
     "language_code": "hin",
@@ -2959,18 +2688,6 @@
     "streams": [
       "https://drk6xq0vhn.gpcdn.net/live/animal_planet_sd_abr/index.m3u8",
       "https://drk6xq0vhn.gpcdn.net/live/animal_planet_hd_abr/index.m3u8"
-    ],
-    "category": "infotainment"
-  },
-  {
-    "id": "NationalGeographicWild.in",
-    "name": "Nat Geo Wild HD",
-    "language_code": "hin",
-    "language_name": "Hindi",
-    "network": "Disney",
-    "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_NAT_GEO_WILD/images/LOGO_HD/image.png",
-    "streams": [
-      "http://103.185.24.134:3001/NATGEO-WILD-HD/index.m3u8"
     ],
     "category": "infotainment"
   },
@@ -3069,55 +2786,6 @@
       "https://mumt04.tangotv.in/m18aqlK4RAFTAARMEDIA/index.m3u8"
     ],
     "category": "news"
-  },
-  {
-    "id": "SonySportsTen1.in",
-    "name": "Sony Sports Ten 1 HD",
-    "language_code": "eng",
-    "language_name": "English",
-    "network": "Sony",
-    "logo": "https://xstreamcp-assets-msp.streamready.in/assets/LIVETV/LIVECHANNEL/LIVETV_LIVETVCHANNEL_SONY_SPORTS_TEN_1/images/LOGO_HD/image.png",
-    "streams": [
-      "http://103.151.60.162:2122/play/a01c/index.m3u8?hls",
-      "http://103.185.24.134:3001/SonyTenSports1/index.m3u8"
-    ],
-    "category": "entertainment"
-  },
-  {
-    "id": "StarSports1.in",
-    "name": "Star Sports 1",
-    "language_code": "eng",
-    "language_name": "English",
-    "network": "Star",
-    "logo": "https://i.imgur.com/E5jjKHI.png",
-    "streams": [
-      "http://103.151.60.162:2122/play/a01a/index.m3u8?hls"
-    ],
-    "category": "entertainment"
-  },
-  {
-    "id": "StarSportsSelect1.in",
-    "name": "Star Sports Select 1 HD",
-    "language_code": "eng",
-    "language_name": "English",
-    "network": "Star",
-    "logo": "https://i.imgur.com/Mh9tKPx.png",
-    "streams": [
-      "http://103.151.60.162:2122/play/a026/index.m3u8?hls"
-    ],
-    "category": "entertainment"
-  },
-  {
-    "id": "StarSportsSelect2.in",
-    "name": "Star Sports Select 2 HD",
-    "language_code": "eng",
-    "language_name": "English",
-    "network": "Star",
-    "logo": "https://i.imgur.com/FtRT73R.png",
-    "streams": [
-      "http://103.151.60.162:2122/play/a027/index.m3u8?hls"
-    ],
-    "category": "entertainment"
   },
   {
     "id": "Eurosport.in",
@@ -3359,5 +3027,137 @@
       "https://manatv.akamaized.net/090823/smil:ristheyamerica.smil/playlist.m3u8"
     ],
     "category": "entertainment"
+  },
+  {
+    "id": "BloombergUS.us",
+    "name": "Bloomberg TV US",
+    "language_code": "eng",
+    "language_name": "English",
+    "network": "Bloomberg",
+    "logo": "https://tmsimg.fancybits.co/assets/s71799_ll_h15_aa.png?w=360&h=270",
+    "category": "news",
+    "streams": [
+      "https://dai.google.com/linear/hls/event/6JVA-Zs8Rbuj0qoA5Gso1Q/master.m3u8"
+    ]
+  },
+  {
+    "id": "BloombergAsia.us",
+    "name": "Bloomberg TV Asia",
+    "language_code": "eng",
+    "language_name": "English",
+    "network": "Bloomberg",
+    "logo": "https://tmsimg.fancybits.co/assets/s14755_ll_h15_ab.png?w=360&h=270",
+    "category": "news",
+    "streams": [
+      "https://dai.google.com/linear/hls/event/FvrjI2MQSs6_bNTURP2CaA/master.m3u8"
+    ]
+  },
+  {
+    "id": "CBSNews247.us",
+    "name": "CBS News 24/7",
+    "language_code": "eng",
+    "language_name": "English",
+    "network": "CBS",
+    "logo": "https://assets2.cbsnewsstatic.com/hub/i/r/2024/04/16/0fb75ad2-a909-44bb-87dc-86b9d51cbeb2/thumbnail/640x360/1ccc32a8059d6432a82e11e3aca70c23/247-key-channelthumbnail-1920x1080.jpg",
+    "category": "news",
+    "streams": [
+      "https://dai.google.com/linear/hls/event/Sid4xiTQTkCT1SLu6rjUSQ/master.m3u8"
+    ]
+  },
+  {
+    "id": "DWNews.de",
+    "name": "DW News HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "network": "Deutsche Welle",
+    "logo": "https://www.dw.com/images/icons/favicon-180x180.png",
+    "category": "news",
+    "streams": [
+      "https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/master.m3u8"
+    ]
+  },
+  {
+    "id": "NHKWorld.jp",
+    "name": "NHK World Japan",
+    "language_code": "eng",
+    "language_name": "English",
+    "network": "NHK",
+    "logo": "https://static.nhk.or.jp/nhkworld/common/images/icon/icon_touch_192.png",
+    "category": "news",
+    "streams": [
+      "https://media-tyo.hls.nhkworld.jp/hls/w/live/master.m3u8"
+    ]
+  },
+  {
+    "id": "TRTWorld.tr",
+    "name": "TRT World HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "network": "TRT",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/TRT_World_logo.svg/512px-TRT_World_logo.svg.png",
+    "category": "news",
+    "streams": [
+      "https://tv-trtworld.medya.trt.com.tr/master.m3u8"
+    ]
+  },
+  {
+    "id": "Newsmax2.us",
+    "name": "Newsmax 2",
+    "language_code": "eng",
+    "language_name": "English",
+    "network": "Newsmax",
+    "logo": "https://images.pluto.tv/channels/64b58ebc1e30900008324f4e/colorLogoPNG.png",
+    "category": "news",
+    "streams": [
+      "https://n2ctsota.akamaized.net/hls/live/2113130/Live_1/index.m3u8"
+    ]
+  },
+  {
+    "id": "InsideEdition.us",
+    "name": "Inside Edition 24/7",
+    "language_code": "eng",
+    "language_name": "English",
+    "network": "CBS",
+    "logo": "https://wwwimage-tve.cbsstatic.com/thumbnails/photos/w370-q80/channel/inside-edition.png",
+    "category": "entertainment",
+    "streams": [
+      "https://dai.google.com/linear/hls/event/Y2DMgfclT3S2nNxANeIawA/master.m3u8"
+    ]
+  },
+  {
+    "id": "ETLive.us",
+    "name": "ET Live",
+    "language_code": "eng",
+    "language_name": "English",
+    "network": "Paramount",
+    "logo": "https://images.pluto.tv/channels/5ca292e861219b2241cf43eb/colorLogoPNG.png",
+    "category": "entertainment",
+    "streams": [
+      "https://dai.google.com/linear/hls/event/xrVrJYTmTfitfXBQfeZByQ/master.m3u8"
+    ]
+  },
+  {
+    "id": "CBSSportsHQ.us",
+    "name": "CBS Sports HQ",
+    "language_code": "eng",
+    "language_name": "English",
+    "network": "CBS",
+    "logo": "https://assets2.cbsnewsstatic.com/hub/i/r/2019/04/09/a2f3fec8-3485-4081-8b3d-4c3bb748f2fa/thumbnail/620x349/5643444fc273577d46813bf6c22c069d/cbs-sports-hq-logo.jpg",
+    "category": "entertainment",
+    "streams": [
+      "https://dai.google.com/linear/hls/event/9Lq0ERvoSR-z9AwvFS-xYA/master.m3u8"
+    ]
+  },
+  {
+    "id": "NASATV.us",
+    "name": "NASA TV HD",
+    "language_code": "eng",
+    "language_name": "English",
+    "network": "NASA",
+    "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/NASA_logo.svg/512px-NASA_logo.svg.png",
+    "category": "infotainment",
+    "streams": [
+      "https://ntv1.akamaized.net/hls/live/2014075/NASA-NTV1-HLS/master.m3u8"
+    ]
   }
 ]
