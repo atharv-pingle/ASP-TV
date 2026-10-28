@@ -47,6 +47,8 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
   VideoScaleMode _scaleMode = VideoScaleMode.stretch;
   String _hudMessage = '';
   Timer? _hudTimer;
+  Timer? _initTimeoutTimer;
+  Timer? _bufferingTimer;
 
   final FocusNode _focusNode = FocusNode();
 
@@ -78,6 +80,9 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
   }
 
   void _playChannel(Channel channel, {bool isInitial = false}) {
+    _initTimeoutTimer?.cancel();
+    _bufferingTimer?.cancel();
+    _bufferingTimer = null;
     if (!isInitial && _currentChannel.id != channel.id) {
       _previousChannel = _currentChannel;
     }
@@ -110,6 +115,9 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
   }
 
   void _startStream() {
+    _initTimeoutTimer?.cancel();
+    _bufferingTimer?.cancel();
+    _bufferingTimer = null;
     _controller?.removeListener(_checkStreamHealth);
     _controller?.dispose();
     _controller = null;
@@ -122,6 +130,10 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
       });
       _scheduleOsdHide();
       return;
+    }
+
+    if (_currentStreamIndex >= _currentChannel.streams.length) {
+      _currentStreamIndex = 0;
     }
 
     final streamUrl = _currentChannel.streams[_currentStreamIndex].trim();
@@ -150,7 +162,15 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
 
     _controller = controller;
 
+    // Timeout guard: failover automatically if connection hangs (> 8 seconds)
+    _initTimeoutTimer = Timer(const Duration(seconds: 8), () {
+      if (mounted && _controller == controller && _isLoading) {
+        _handleStreamFailure('Connection timed out (8s)');
+      }
+    });
+
     controller.initialize().then((_) {
+      _initTimeoutTimer?.cancel();
       if (!mounted || _controller != controller) return;
       setState(() {
         _isLoading = false;
@@ -158,7 +178,15 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
       });
       controller.play();
       controller.addListener(_checkStreamHealth);
+
+      // Smart promotion: promote working fallback stream to primary (index 0)
+      if (_currentStreamIndex > 0 && _currentStreamIndex < _currentChannel.streams.length) {
+        final workingStream = _currentChannel.streams.removeAt(_currentStreamIndex);
+        _currentChannel.streams.insert(0, workingStream);
+        _currentStreamIndex = 0;
+      }
     }).catchError((error) {
+      _initTimeoutTimer?.cancel();
       if (!mounted || _controller != controller) return;
       _handleStreamFailure('Connection error: $error');
     });
@@ -166,23 +194,45 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
 
   void _checkStreamHealth() {
     final c = _controller;
-    if (c != null && c.value.hasError && mounted && !_hasError) {
+    if (c == null) return;
+
+    if (c.value.hasError && mounted && !_hasError) {
       _handleStreamFailure(c.value.errorDescription ?? 'Playback error');
+      return;
+    }
+
+    // Monitor for permanent buffering stalls (> 10s)
+    if (c.value.isBuffering && mounted && !_isLoading && !_hasError) {
+      _bufferingTimer ??= Timer(const Duration(seconds: 10), () {
+        if (mounted && (_controller?.value.isBuffering ?? false)) {
+          _handleStreamFailure('Playback stalled in buffering');
+        }
+      });
+    } else {
+      _bufferingTimer?.cancel();
+      _bufferingTimer = null;
     }
   }
 
   void _handleStreamFailure(String errorDetail) {
+    _initTimeoutTimer?.cancel();
+    _bufferingTimer?.cancel();
+    _bufferingTimer = null;
+
     // Attempt next stream mirror automatically
     if (_currentStreamIndex + 1 < _currentChannel.streams.length) {
+      final nextIdx = _currentStreamIndex + 1;
+      final total = _currentChannel.streams.length;
+      _triggerHud('Stream failed • Auto-switching to mirror ${nextIdx + 1}/$total...');
       setState(() {
-        _currentStreamIndex++;
+        _currentStreamIndex = nextIdx;
       });
       _startStream();
     } else {
       setState(() {
         _isLoading = false;
         _hasError = true;
-        _errorMessage = 'Stream unavailable. Press retry or change channel.';
+        _errorMessage = 'Stream unavailable (${_currentChannel.streams.length} mirror${_currentChannel.streams.length > 1 ? 's' : ''} tried).';
         _showOsd = true;
       });
     }
@@ -504,6 +554,8 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
 
   @override
   void dispose() {
+    _initTimeoutTimer?.cancel();
+    _bufferingTimer?.cancel();
     _osdTimer?.cancel();
     _hudTimer?.cancel();
     _bottomBarTimer?.cancel();
@@ -902,6 +954,27 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                                               color: TVTheme.textSecondary,
                                             ),
                                           ),
+                                          if (_currentChannel.streams.length > 1) ...[
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 5, vertical: 1.5),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white12,
+                                                borderRadius: BorderRadius.circular(4),
+                                                border: Border.all(
+                                                    color: Colors.white24, width: 0.8),
+                                              ),
+                                              child: Text(
+                                                'SRC ${_currentStreamIndex + 1}/${_currentChannel.streams.length}',
+                                                style: const TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.white70,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                           if (liveProgram != null) ...[
                                             const SizedBox(width: 10),
                                             Flexible(
