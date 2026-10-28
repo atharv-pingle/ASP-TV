@@ -10,8 +10,11 @@ class EpgService with ChangeNotifier {
   factory EpgService() => instance;
   EpgService._internal();
 
-  static const String _tataplayEpgUrl =
-      'https://raw.githubusercontent.com/mitthu786/tvepg/main/tataplay/epg.xml.gz';
+  static const List<String> _epgSources = [
+    'https://raw.githubusercontent.com/mitthu786/tvepg/main/tataplay/epg.xml.gz',
+    'https://iptv-org.github.io/epg/guides/in.xml.gz',
+    'https://iptv-org.github.io/epg/guides/us.xml.gz',
+  ];
 
   final Map<String, List<EpgProgram>> _channelPrograms = {};
   bool _isLoading = false;
@@ -26,7 +29,7 @@ class EpgService with ChangeNotifier {
     _generateDefaultSchedules();
     notifyListeners();
 
-    // Fetch live XMLTV data in background
+    // Fetch live XMLTV data across multiple sources in background
     _fetchLiveEpgInBackground();
   }
 
@@ -36,24 +39,33 @@ class EpgService with ChangeNotifier {
 
   void _fetchLiveEpgInBackground() async {
     _isLoading = true;
-    try {
-      final response = await http
-          .get(Uri.parse(_tataplayEpgUrl))
-          .timeout(const Duration(seconds: 15));
 
-      if (response.statusCode == 200) {
-        final decompressedBytes = gzip.decode(response.bodyBytes);
-        final xmlContent = utf8.decode(decompressedBytes, allowMalformed: true);
-        _parseXmltvContent(xmlContent);
-        _isLoading = false;
-        notifyListeners();
+    for (final url in _epgSources) {
+      try {
+        final response = await http
+            .get(Uri.parse(url))
+            .timeout(const Duration(seconds: 15));
+
+        if (response.statusCode == 200) {
+          String xmlContent;
+          if (url.endsWith('.gz')) {
+            final decompressedBytes = gzip.decode(response.bodyBytes);
+            xmlContent = utf8.decode(decompressedBytes, allowMalformed: true);
+          } else {
+            xmlContent = utf8.decode(response.bodyBytes, allowMalformed: true);
+          }
+          _parseXmltvContent(xmlContent);
+          notifyListeners();
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('EpgService source note ($url): $e');
+        }
       }
-    } catch (e) {
-      if (kDebugMode) {
-        print('EpgService background fetch note: $e');
-      }
-      _isLoading = false;
     }
+
+    _isLoading = false;
+    notifyListeners();
   }
 
   void _parseXmltvContent(String xml) {
@@ -107,9 +119,11 @@ class EpgService with ChangeNotifier {
   }
 
   EpgProgram? getCurrentProgram(Channel channel) {
+    final baseId = channel.id.contains('.') ? channel.id.split('.').first : channel.id;
     final keys = [
       _normalizeKey(channel.id),
       _normalizeKey(channel.name),
+      _normalizeKey(baseId),
     ];
 
     for (final k in keys) {
@@ -126,9 +140,11 @@ class EpgService with ChangeNotifier {
   }
 
   EpgProgram? getNextProgram(Channel channel) {
+    final baseId = channel.id.contains('.') ? channel.id.split('.').first : channel.id;
     final keys = [
       _normalizeKey(channel.id),
       _normalizeKey(channel.name),
+      _normalizeKey(baseId),
     ];
 
     final now = DateTime.now();
@@ -247,6 +263,36 @@ class EpgService with ChangeNotifier {
       '9xomusic': 'Fresh Pop Anthems',
       'tlchd': 'Cake Boss & World Cuisine',
       'discoveryscience': 'How It\'s Made & Space Secrets',
+      'themovieclub': 'Bollywood Superhit Premiere',
+      'aashirwadtv': 'Sampoorna Aarti & Bhakti Sangrah',
+      'theq': 'The Q Trending Comedy & Web Series',
+      'mastiii': 'Mastiii Non-Stop Bollywood Hits',
+      'tastemade': 'Tastemade Food & Travel Chronicles',
+      'docubay': 'DocuBay International Expeditions',
+      'lovenature': 'Love Nature: Predators of the Deep',
+      'plutocomedy': 'Pluto Comedy Club: Best of Standup',
+      'plutoaction': 'Adrenaline Rush Action Blockbuster',
+      'plutodrama': 'Classic Hollywood Drama Spotlight',
+      'plutokids': 'All-Day Animated Superstars',
+      'mst3k': 'Mystery Science Theater 3000 Showcase',
+      'realstories': 'Real Stories: Human Life Documentaries',
+      'timeline': 'Timeline: Ancient History & Civilizations',
+      'bloombergus': 'Bloomberg Markets: The Close',
+      'bloombergasia': 'Bloomberg Markets: Asia Daybreak',
+      'redbulltv': 'Red Bull Signature Series: Action Sports',
+      'euronewsenglish': 'Euronews World Dispatch & Business',
+      'aljazeeraenglish': 'NewsGrid & World Report Live',
+      'weathernation': 'WeatherNation Live Radar & Severe Updates',
+      'cheddarnews': 'Cheddar Opening Bell: Tech & Markets',
+      'toongoggles': 'Toon Goggles Cartoon Adventures',
+      'ducktv': 'DuckTV Morning Play & Learning',
+      '48hours': '48 Hours: True Crime Investigations',
+      'ign': 'IGN Daily Fix & Game Previews',
+      'filmstream': 'Filmstream International Cinema',
+      'rakutenactionmovies': 'Rakuten Action Movie Premiere',
+      'failarmy': 'FailArmy Top Viral Clips of the Week',
+      'peopleareawesome': 'People Are Awesome: Extreme Feats',
+      'nasatv': 'NASA Space Station Live & Earth Views',
     };
 
     for (final entry in popularShows.entries) {

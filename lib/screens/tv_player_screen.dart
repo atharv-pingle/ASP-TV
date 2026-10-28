@@ -954,6 +954,38 @@ class _TVPlayerScreenState extends State<TVPlayerScreen> {
                                               color: TVTheme.textSecondary,
                                             ),
                                           ),
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: _currentChannel.providerTag.contains('Samsung')
+                                                  ? const Color(0xFF0F4C81).withOpacity(0.5)
+                                                  : _currentChannel.providerTag.contains('Pluto')
+                                                      ? const Color(0xFF806600).withOpacity(0.5)
+                                                      : Colors.white12,
+                                              borderRadius: BorderRadius.circular(4),
+                                              border: Border.all(
+                                                color: _currentChannel.providerTag.contains('Samsung')
+                                                    ? const Color(0xFF1473E6)
+                                                    : _currentChannel.providerTag.contains('Pluto')
+                                                        ? const Color(0xFFFFCC00)
+                                                        : Colors.white24,
+                                                width: 0.8,
+                                              ),
+                                            ),
+                                            child: Text(
+                                              _currentChannel.providerTag,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                color: _currentChannel.providerTag.contains('Samsung')
+                                                    ? const Color(0xFF99CCFF)
+                                                    : _currentChannel.providerTag.contains('Pluto')
+                                                        ? const Color(0xFFFFEE99)
+                                                        : Colors.white,
+                                              ),
+                                            ),
+                                          ),
                                           if (_currentChannel.streams.length > 1) ...[
                                             const SizedBox(width: 8),
                                             Container(

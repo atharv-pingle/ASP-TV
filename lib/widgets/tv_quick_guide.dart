@@ -295,21 +295,42 @@ class _TVQuickGuideState extends State<TVQuickGuide> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  ch.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: isFocused || isCurrent
-                                        ? FontWeight.bold
-                                        : FontWeight.w500,
-                                    color: isFocused
-                                        ? Colors.black87
-                                        : isCurrent
-                                            ? Colors.white
-                                            : TVTheme.textSecondary,
-                                  ),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        ch.name,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: isFocused || isCurrent
+                                              ? FontWeight.bold
+                                              : FontWeight.w500,
+                                          color: isFocused
+                                              ? Colors.black87
+                                              : isCurrent
+                                                  ? Colors.white
+                                                  : TVTheme.textSecondary,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      ch.providerTag,
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w600,
+                                        color: isFocused
+                                            ? Colors.black54
+                                            : ch.providerTag.contains('Samsung')
+                                                ? const Color(0xFF6BB5FF)
+                                                : ch.providerTag.contains('Pluto')
+                                                    ? const Color(0xFFFFCC00)
+                                                    : TVTheme.textMuted,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 if (liveProgram != null) ...[
                                   const SizedBox(height: 1),

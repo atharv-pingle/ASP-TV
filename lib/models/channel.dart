@@ -8,6 +8,7 @@ class Channel {
   final String category;
   final List<String> streams;
   final List<String> audioLanguages;
+  final String? customProvider;
   bool isFavorite;
 
   Channel({
@@ -21,7 +22,9 @@ class Channel {
     required this.streams,
     List<String>? audioLanguages,
     this.isFavorite = false,
-  }) : audioLanguages = audioLanguages ?? _defaultAudioLanguages(category, languageName);
+    String? provider,
+  }) : customProvider = provider,
+       audioLanguages = audioLanguages ?? _defaultAudioLanguages(category, languageName);
 
   static List<String> _defaultAudioLanguages(String cat, String lang) {
     if (cat == 'infotainment' || cat == 'kids') {
@@ -34,6 +37,35 @@ class Channel {
   }
 
   String get primaryStream => streams.isNotEmpty ? streams.first.trim() : '';
+
+  String get providerTag {
+    if (customProvider != null && customProvider!.trim().isNotEmpty) {
+      return customProvider!.trim();
+    }
+    final stream = primaryStream.toLowerCase();
+    final net = network.toLowerCase();
+    final chId = id.toLowerCase();
+
+    if (stream.contains('samsung') || net.contains('samsung') || chId.contains('samsung')) {
+      return 'Samsung TV+';
+    }
+    if (stream.contains('pluto') || net.contains('pluto') || chId.contains('pluto')) {
+      return 'Pluto TV';
+    }
+    if (stream.contains('plex') || net.contains('plex') || chId.contains('plex')) {
+      return 'Plex';
+    }
+    if (stream.contains('wurl') || stream.contains('amagi') || stream.contains('dai.google.com') || stream.contains('rakuten')) {
+      return 'FAST TV';
+    }
+    if (net.contains('tataplay') || net.contains('tata play') || stream.contains('tataplay')) {
+      return 'Tata Play';
+    }
+    if (network.isNotEmpty && network.length <= 16 && !network.contains('http')) {
+      return network;
+    }
+    return 'Live TV';
+  }
 
   factory Channel.fromJson(Map<String, dynamic> json) {
     List<String> streamList = [];
@@ -57,6 +89,8 @@ class Channel {
       customAudios = (json['audio_languages'] as List).map((e) => e.toString()).toList();
     }
 
+    final prov = json['provider']?.toString().trim();
+
     return Channel(
       id: json['id']?.toString().trim() ?? json['name']?.toString().trim() ?? '',
       name: json['name']?.toString().trim() ?? 'Unknown Channel',
@@ -68,6 +102,7 @@ class Channel {
       streams: streamList,
       audioLanguages: customAudios,
       isFavorite: json['isFavorite'] == true,
+      provider: prov,
     );
   }
 
@@ -78,6 +113,7 @@ class Channel {
       'language_code': languageCode,
       'language_name': languageName,
       'network': network,
+      'provider': providerTag,
       'logo': logo,
       'category': category,
       'streams': streams,

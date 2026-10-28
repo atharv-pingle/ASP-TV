@@ -383,6 +383,40 @@ class _TVChannelCardState extends State<TVChannelCard> {
                   ),
                 ),
 
+                // Provider Source Tag (Top Left)
+                Positioned(
+                  top: 9,
+                  left: 9,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.72),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(
+                        color: widget.channel.providerTag.contains('Samsung')
+                            ? const Color(0xFF1473E6)
+                            : widget.channel.providerTag.contains('Pluto')
+                                ? const Color(0xFFFFCC00)
+                                : Colors.white24,
+                        width: 0.8,
+                      ),
+                    ),
+                    child: Text(
+                      widget.channel.providerTag,
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        color: widget.channel.providerTag.contains('Samsung')
+                            ? const Color(0xFF6BB5FF)
+                            : widget.channel.providerTag.contains('Pluto')
+                                ? const Color(0xFFFFE066)
+                                : Colors.white70,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ),
+                ),
+
                 // Favorite Star Indicator (Top Right)
                 if (widget.channel.isFavorite)
                   Positioned(
